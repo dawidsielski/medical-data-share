@@ -158,13 +158,12 @@ def variants_public():
             genome_build = 'hg19'  # this will be hg19 or hg38
             chr = params['chr']
             start = params['start']
-            end = params['end']
         except KeyError as e:
             logger.exception(e)
             return abort(406)
 
         try:
-            chromosome_results = tabix_query(genome, chr, start, end)
+            chromosome_results = tabix_query(genome, chr, start, start)
             response = {'result': list(chromosome_results)}
             return json.dumps(response), 200
         except Exception as e:
@@ -172,6 +171,39 @@ def variants_public():
             return abort(500)
 
     return render_template('public_variants.html')
+
+
+@server.route('/variants-private', methods=['GET', 'POST'])
+def variants_private():
+    variants_path = os.path.join(os.getcwd(), 'data')
+    genome = os.path.join(variants_path, 'gnomad.exomes.r2.0.2.sites.ACAFAN.tsv.gz')
+
+    if request.method == 'POST':
+        try:
+            params = request.get_json()
+            param_keys = params.keys()
+            genome_build = 'hg19'  # this will be hg19 or hg38
+
+            if 'end' in param_keys and 'start' in param_keys and 'chrom' in param_keys:
+                chromosome_results = tabix_query(genome, params['chrom'], params['start'], params['end'])
+            elif 'start' in param_keys and 'chrom' in param_keys:
+                chromosome_results = tabix_query(genome, params['chrom'], params['start'], params['start'])
+            elif 'chrom' in param_keys:
+                chromosome_results = tabix_query(genome, params['chrom'])
+            else:
+                pass
+
+        except KeyError as e:
+            logger.exception(e)
+            return abort(406)
+
+        try:
+            response = {'result': list(chromosome_results)}
+            return json.dumps(response), 200
+        except Exception as e:
+            logger.exception(e)
+            return abort(500)
+    return render_template('private_variants.html')
 
 
 @server.route('/nodes', methods=['GET', 'POST'])

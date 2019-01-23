@@ -27,7 +27,8 @@
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
             <a id="home" class="nav-item nav-link" href="{{ url_for('home') }}">Home</a>
-            <a id="variants" class="nav-item nav-link" href="{{ url_for('variants_public') }}">Variants</a>
+            <a id="variants_public" class="nav-item nav-link" href="{{ url_for('variants_public') }}">Variants</a>
+            <a id="variants_private" class="nav-item nav-link" href="{{ url_for('variants_private') }}">Variants</a>
             <a id="nodes" class="nav-item nav-link" href="{{ url_for('available_nodes') }}">Nodes</a>
         </div>
     </div>
