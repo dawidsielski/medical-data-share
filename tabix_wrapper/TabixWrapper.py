@@ -6,8 +6,7 @@ def bgzip(filename):
     Popen(['bgzip', '-f', filename])
 
 
-def tabix_index(filename,
-        preset="gff", chrom=1, start=4, end=5, skip=0, comment="#"):
+def tabix_index(filename, preset="gff", chrom=1, start=4, end=5, skip=0, comment="#"):
     """Call tabix to create an index for a bgzip-compressed file."""
     Popen(['tabix', '-p', preset, '-s', chrom, '-b', start, '-e', end,
         '-S', skip, '-c', comment])

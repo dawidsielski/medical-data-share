@@ -149,8 +149,8 @@ def variants_public():
     Having bad post arguments will result in 406 status code.
     Having problems with running tabix will result in 500 internal error status code.
     """
-    variants_path = os.path.join(os.getcwd(), 'ngs', 'data', 'variants', 'ngs')
-    chrom = os.path.join(variants_path, 'gnomad.exomes.r2.0.2.sites.ACAFAN.tsv.gz')
+    variants_path = os.path.join(os.getcwd(), 'data')
+    genome = os.path.join(variants_path, 'gnomad.exomes.r2.0.2.sites.ACAFAN.tsv.gz')
 
     if request.method == 'POST':
         try:
@@ -164,7 +164,7 @@ def variants_public():
             return abort(406)
 
         try:
-            chromosome_results = tabix_query(chrom, chr, start, end)
+            chromosome_results = tabix_query(genome, chr, start, end)
             response = {'result': list(chromosome_results)}
             return json.dumps(response), 200
         except Exception as e:
