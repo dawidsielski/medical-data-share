@@ -235,3 +235,8 @@ $RECYCLE.BIN/
 # Pickle files
 *.pkl
 # End of https://www.gitignore.io/api/linux,python,windows,pycharm+all,jupyternotebook
+
+# Data folders
+nodes_available/nodes_available.json
+nodes
+keys

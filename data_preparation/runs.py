@@ -1,6 +1,18 @@
+import logging
 import pandas as pd
 
 import path_processing
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+formatter = logging.Formatter('%(asctime)s:%(name)s:%(funcName)s:%(message)s')
+
+file_handler = logging.FileHandler('logs/runs.log')
+file_handler.setLevel(logging.INFO)
+file_handler.setFormatter(formatter)
+
+logger.addHandler(file_handler)
 
 
 def get_summary(run_id):
@@ -8,6 +20,7 @@ def get_summary(run_id):
     new_columns = ['Sample ID', 'Total', 'Mean', 'Above 5%', 'Above 10%', 'Above 20%']
 
     summary_path = path_processing.get_sample_coverage_path(run_id)
+    logger.debug(f'Sample coverage path: {summary_path}')
 
     sample_summary = pd.read_csv(summary_path, delimiter='\t', index_col=False, usecols=columns)
     sample_summary.rename(columns=dict(zip(columns, new_columns)), inplace=True)
@@ -19,6 +32,7 @@ def get_summary(run_id):
 
 def get_gene_summary(run_id):
     summary_path = path_processing.get_sample_gene_coverage_path(run_id)
+    logger.debug(f'Sample gene summary path {summary_path}')
 
     sample_gene_summary = pd.read_csv(summary_path, delimiter='\t', index_col=False)
     return sample_gene_summary
@@ -34,8 +48,10 @@ def extract_data_from_multisample_stats(path):
     return lines
 
 
+# variants
 def get_multisample_stats_df(run_id):
     path = path_processing.get_multisample_vcf_stats_path(run_id)
+    logger.debug(f'Multisample vcf stats path {path}')
 
     if not path_processing.check_existence(path):
         return False, False
