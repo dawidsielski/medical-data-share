@@ -156,14 +156,14 @@ def variants_public():
         try:
             params = request.get_json()
             genome_build = 'hg19'  # this will be hg19 or hg38
-            chr = params['chr']
+            chrom = params['chrom']
             start = params['start']
         except KeyError as e:
             logger.exception(e)
             return abort(406)
 
         try:
-            chromosome_results = tabix_query(genome, chr, start, start)
+            chromosome_results = tabix_query(genome, chrom, start, start)
             response = {'result': list(chromosome_results)}
             return json.dumps(response), 200
         except Exception as e:
