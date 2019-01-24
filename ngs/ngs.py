@@ -145,7 +145,7 @@ def add_node():
 @server.route('/variants', methods=['GET', 'POST'])
 def variants_public():
     """
-    This is an public variants download api that will return variants for a given chromosome from start to end position.
+    This is a public variants download api that will return variants for a given chromosome from start to end position.
 
     As a GET request is presents a website how to use this endpoing.
 
@@ -180,7 +180,6 @@ def variants_public():
             logger.exception(e)
             return abort(500)
 
-
     data = {
         'lab_name': config.get('NODE', 'LABORATORY_NAME')
     }
@@ -189,6 +188,22 @@ def variants_public():
 
 @server.route('/variants-private', methods=['GET', 'POST'])
 def variants_private():
+    """
+    This is a private variant download api that will return variants depending on a given query.
+
+    As a GET request is presents a website how to use this endpoing.
+
+    As a POST request is returns information about variants asked in the POST request data.
+    POST arguments:
+        genome_build (str): information about the genome build (hg19 or hg38)
+        chr (str): chromosome number
+        start (str): starting point
+        end (str): end point
+        signature (str): TODO
+
+    Having bad post arguments will result in 406 status code.
+    Having problems with running tabix will result in 500 internal error status code.
+    """
     variants_path = os.path.join(os.getcwd(), 'data')
     genome = os.path.join(variants_path, 'gnomad.exomes.r2.0.2.sites.ACAFAN.tsv.gz')
 
@@ -205,7 +220,7 @@ def variants_private():
             elif 'chrom' in param_keys:
                 chromosome_results = tabix_query(genome, params['chrom'])
             else:
-                pass
+                chromosome_results = []
 
         except KeyError as e:
             logger.exception(e)
