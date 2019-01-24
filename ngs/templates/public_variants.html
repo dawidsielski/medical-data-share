@@ -3,18 +3,13 @@
 <h3>Variants endpoint</h3>
 <p>
     To obtain data you have to perform post request to this endpoint.
-
-    To perform valid POST request you have to supply the following data:
-    <ol>
-        <li>Coś</li>
-        <li>Coś</li>
-        <li>Coś</li>
-        <li>Coś</li>
-    </ol>
+    <div>
+        You are allowed only to download variants in a specific place.
+    </div>
 
     Sample POST request using curl:
     <div class="alert alert-secondary" role="alert">
-      curl -d '{"chrom":"1", "start":"1", "end":"10"}' -H "Content-Type: application/json" -X POST post_url
+      curl -d '{"chrom":"1", "start":"1"}' -H "Content-Type: application/json" -X POST post_url
     </div>
 </p>
 {% endblock %}
