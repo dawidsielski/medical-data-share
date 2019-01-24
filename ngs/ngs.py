@@ -4,13 +4,17 @@ import os
 import datetime
 import base64
 
-
-from flask import Flask, render_template, send_from_directory, redirect, url_for, jsonify, request, abort
+from flask import Flask, render_template, redirect, url_for, jsonify, request, abort
 
 from data_share.DataShare import DataShare
 
 from tabix_wrapper import tabix_query
 from nodes_available.NodesChecker import NODES_PATH
+
+from configparser import ConfigParser
+
+config = ConfigParser()
+config.read(os.path.join(os.getcwd(), 'config.ini'), encoding='utf-8')
 
 server = Flask(__name__)
 
@@ -29,7 +33,10 @@ logger.addHandler(file_handler)
 @server.route("/")
 def home():
     logger.info("Runs page rendered.")
-    return render_template('index.html')
+    data = {
+        'lab_name': config.get('NODE', 'LABORATORY_NAME')
+    }
+    return render_template('index.html', **data)
 
 
 @server.errorhandler(404)
@@ -38,7 +45,10 @@ def page_not_found(error):
     This function renders 404 page.
     """
     logger.error('Page not found.')
-    return render_template('page_not_found.html'), 404
+    data = {
+        'lab_name': config.get('NODE', 'LABORATORY_NAME')
+    }
+    return render_template('page_not_found.html', **data), 404
 
 
 @server.route("/sample-data")
@@ -170,7 +180,11 @@ def variants_public():
             logger.exception(e)
             return abort(500)
 
-    return render_template('public_variants.html')
+
+    data = {
+        'lab_name': config.get('NODE', 'LABORATORY_NAME')
+    }
+    return render_template('public_variants.html', **data)
 
 
 @server.route('/variants-private', methods=['GET', 'POST'])
@@ -203,12 +217,20 @@ def variants_private():
         except Exception as e:
             logger.exception(e)
             return abort(500)
-    return render_template('private_variants.html')
+
+    data = {
+        'lab_name': config.get('NODE', 'LABORATORY_NAME')
+    }
+    return render_template('private_variants.html', **data)
 
 
 @server.route('/nodes', methods=['GET', 'POST'])
 def available_nodes():
     available_nodes_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'nodes_available', 'nodes_available.json')
     with open(available_nodes_path, 'r') as json_file:
-        data = json.load(json_file)
-    return render_template('nodes.html', nodes=data)
+        nodes = json.load(json_file)
+
+    data = {
+        'lab_name': config.get('NODE', 'LABORATORY_NAME')
+    }
+    return render_template('nodes.html', nodes=nodes, **data)
