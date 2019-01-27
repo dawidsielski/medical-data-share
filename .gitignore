@@ -241,3 +241,6 @@ nodes_available/nodes_available.json
 nodes
 keys
 data
+
+# temp files
+temp.json

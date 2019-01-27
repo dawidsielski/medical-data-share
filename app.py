@@ -29,6 +29,7 @@ if __name__ == '__main__':
     [check_folder(folder) for folder in FOLDERS]
     keys = KeyGeneration()
     keys.load_or_generate()
+    PublicVariantsHandler.create_temp_file()
 
     from ngs.ngs import server
 
