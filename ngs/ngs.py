@@ -8,8 +8,7 @@ from flask import Flask, render_template, redirect, url_for, jsonify, request, a
 
 from data_share.DataShare import DataShare
 
-from tabix_wrapper import tabix_query
-from nodes_available.NodesChecker import NODES_PATH
+from variant_db.TabixedTableVarinatDB import TabixedTableVarinatDB
 
 from configparser import ConfigParser
 
@@ -145,7 +144,7 @@ def add_node():
 @server.route('/variants', methods=['GET', 'POST'])
 def variants_public():
     """
-    This is a public variants download api that will return variants for a given chromosome from start to end position.
+    This is an public variants download api that will return variants for a given chromosome from start to end position.
 
     As a GET request is presents a website how to use this endpoing.
 
@@ -159,9 +158,6 @@ def variants_public():
     Having bad post arguments will result in 406 status code.
     Having problems with running tabix will result in 500 internal error status code.
     """
-    variants_path = os.path.join(os.getcwd(), 'data')
-    genome = os.path.join(variants_path, 'gnomad.exomes.r2.0.2.sites.ACAFAN.tsv.gz')
-
     if request.method == 'POST':
         try:
             params = request.get_json()
@@ -173,7 +169,7 @@ def variants_public():
             return abort(406)
 
         try:
-            chromosome_results = tabix_query(genome, chrom, start, start)
+            chromosome_results = TabixedTableVarinatDB.get_variants(chrom, start, start)
             response = {'result': list(chromosome_results)}
             return json.dumps(response), 200
         except Exception as e:
@@ -204,9 +200,6 @@ def variants_private():
     Having bad post arguments will result in 406 status code.
     Having problems with running tabix will result in 500 internal error status code.
     """
-    variants_path = os.path.join(os.getcwd(), 'data')
-    genome = os.path.join(variants_path, 'gnomad.exomes.r2.0.2.sites.ACAFAN.tsv.gz')
-
     if request.method == 'POST':
         try:
             params = request.get_json()
@@ -214,11 +207,11 @@ def variants_private():
             genome_build = 'hg19'  # this will be hg19 or hg38
 
             if 'end' in param_keys and 'start' in param_keys and 'chrom' in param_keys:
-                chromosome_results = tabix_query(genome, params['chrom'], params['start'], params['end'])
+                chromosome_results = TabixedTableVarinatDB.get_variants(params['chrom'], params['start'], params['end'])
             elif 'start' in param_keys and 'chrom' in param_keys:
-                chromosome_results = tabix_query(genome, params['chrom'], params['start'], params['start'])
+                chromosome_results = TabixedTableVarinatDB.get_variants(params['chrom'], params['start'], params['start'])
             elif 'chrom' in param_keys:
-                chromosome_results = tabix_query(genome, params['chrom'])
+                chromosome_results = TabixedTableVarinatDB.get_variants(params['chrom'])
             else:
                 chromosome_results = []
 
