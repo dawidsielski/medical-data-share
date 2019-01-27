@@ -4,13 +4,12 @@ import os
 import datetime
 import base64
 
+from configparser import ConfigParser
 from flask import Flask, render_template, redirect, url_for, jsonify, request, abort
 
 from data_share.DataShare import DataShare
-
 from variant_db.TabixedTableVarinatDB import TabixedTableVarinatDB
-
-from configparser import ConfigParser
+from utils.public_variants_handler.PublicVariantsHandler import PublicVariantsHandler
 
 config = ConfigParser()
 config.read(os.path.join(os.getcwd(), 'config.ini'), encoding='utf-8')
@@ -159,6 +158,9 @@ def variants_public():
     Having problems with running tabix will result in 500 internal error status code.
     """
     if request.method == 'POST':
+        if PublicVariantsHandler.get_limit_left() <= 0:
+            abort(400, 'Limit reached.')
+
         try:
             params = request.get_json()
             genome_build = 'hg19'  # this will be hg19 or hg38
@@ -171,13 +173,15 @@ def variants_public():
         try:
             chromosome_results = TabixedTableVarinatDB.get_variants(chrom, start, start)
             response = {'result': list(chromosome_results)}
+            PublicVariantsHandler.decrease_number_of_requests_left()
             return json.dumps(response), 200
         except Exception as e:
             logger.exception(e)
             return abort(500)
 
     data = {
-        'lab_name': config.get('NODE', 'LABORATORY_NAME')
+        'lab_name': config.get('NODE', 'LABORATORY_NAME'),
+        'current_limit': PublicVariantsHandler.get_limit_left()
     }
     return render_template('public_variants.html', **data)
 
