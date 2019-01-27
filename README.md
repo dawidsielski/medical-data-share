@@ -4,7 +4,18 @@ DataShare is an online tool for sharing medical variants information.
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+Before running the app there are you have to perform some setup.
+
+First clone the repo by running `git clone`.
+Then in the folder you will see file called `config.ini`. 
+Depending on your laboratory you will have to fill in the variables inside.
+
+Variables you will have to set are:
+* LABORATORY_NAME - this name will be displayed on a website
+* NODE_ADDRESS - this is an address for this node
+
+The most important part is to set up an environment variable called `ENCRYPTION_KEY`.
+This key is used to endrypt data that are shared between the nodes. 
 
 ### Prerequisites
 
