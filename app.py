@@ -21,7 +21,7 @@ def check_folder(folder_name):
 
 sched = BackgroundScheduler(daemon=True)
 sched.add_job(NodesChecker.get_all_nodes_availability, 'interval', minutes=1)
-sched.add_job(PublicVariantsHandler.create_temp_file, 'cron', day``='*')
+sched.add_job(PublicVariantsHandler.create_temp_file, 'cron', day='*')
 sched.start()
 
 
