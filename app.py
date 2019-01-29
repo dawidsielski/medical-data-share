@@ -5,6 +5,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from data_share.KeyGeneration import KeyGeneration
 from nodes_available.NodesChecker import NodesChecker
 from utils.public_variants_handler.PublicVariantsHandler import PublicVariantsHandler
+from utils.encryption_key_generator.EncryptionKeyGenerator import EncryptionKeyGenerator
 
 FOLDERS = ['logs', 'data_acquisition', 'nodes', 'keys']
 
@@ -21,7 +22,7 @@ def check_folder(folder_name):
 
 sched = BackgroundScheduler(daemon=True)
 sched.add_job(NodesChecker.get_all_nodes_availability, 'interval', minutes=1)
-sched.add_job(PublicVariantsHandler.create_temp_file, 'cron', day='*')
+sched.add_job(PublicVariantsHandler.reset_limit, 'cron', day='*')
 sched.start()
 
 
@@ -29,7 +30,11 @@ if __name__ == '__main__':
     [check_folder(folder) for folder in FOLDERS]
     keys = KeyGeneration()
     keys.load_or_generate()
+
     PublicVariantsHandler.create_temp_file()
+
+    ekg = EncryptionKeyGenerator()
+    ekg.generate_and_save()
 
     from ngs.ngs import server
 
