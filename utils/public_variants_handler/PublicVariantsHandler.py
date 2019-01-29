@@ -21,6 +21,16 @@ class PublicVariantsHandler(object):
             json.dump(data, file)
 
     @staticmethod
+    def reset_limit():
+        with open('temp.json', 'r') as file:
+            data = json.load(file)
+
+        data['public_variants_requests_left'] = PublicVariantsHandler.get_limit_from_config()
+
+        with open('temp.json', 'w') as file:
+            json.dump(data, file)
+
+    @staticmethod
     def get_temp():
         with open('temp.json', 'r') as file:
             data = json.load(file)

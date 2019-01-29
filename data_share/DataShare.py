@@ -4,6 +4,7 @@ import base64
 
 from Crypto.Cipher import AES
 from data_share.Pad import Pad
+from utils.encryption_key_generator.EncryptionKeyGenerator import EncryptionKeyGenerator
 
 from Crypto.Hash import SHA256
 from Crypto.PublicKey import RSA
@@ -28,7 +29,7 @@ class DataShare(object):
         :return: (str)
         """
         assert isinstance(data, str)
-        obj = AES.new(os.environ.get('ENCRYPTION_KEY'), AES.MODE_CBC, 'This is an IV456')
+        obj = AES.new(EncryptionKeyGenerator().get_encryption_key(), AES.MODE_CBC, 'This is an IV456')
         bytes_data = bytes.fromhex(data)
         return Pad.unpad(obj.decrypt(bytes_data)).decode()
 
@@ -40,7 +41,7 @@ class DataShare(object):
         :return: (str) data ready to be send
         """
         assert isinstance(data, str)
-        obj = AES.new(os.environ.get('ENCRYPTION_KEY'), AES.MODE_CBC, 'This is an IV456')
+        obj = AES.new(EncryptionKeyGenerator().get_encryption_key(), AES.MODE_CBC, 'This is an IV456')
         padded = Pad.pad(data.encode())
         ciphertext = obj.encrypt(padded)
         return ciphertext.hex()
