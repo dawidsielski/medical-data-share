@@ -24,7 +24,6 @@
             aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-    {{ lab_name }}
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
             <a id="home" class="nav-item nav-link" href="{{ url_for('home') }}">Home</a>
@@ -32,6 +31,9 @@
             <a id="variants_private" class="nav-item nav-link" href="{{ url_for('variants_private') }}">Variants (private)</a>
             <a id="nodes" class="nav-item nav-link" href="{{ url_for('available_nodes') }}">Nodes</a>
         </div>
+    </div>
+    <div>
+        {{ lab_name }}
     </div>
 </nav>
 

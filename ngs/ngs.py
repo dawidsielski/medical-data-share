@@ -169,6 +169,9 @@ def variants_public():
         except KeyError as e:
             logger.exception(e)
             return abort(406)
+        except TypeError as e:
+            logger.exception(e)
+            return abort(406, 'Invalid type or data not supplied.')
 
         try:
             chromosome_results = TabixedTableVarinatDB.get_variants(chrom, start, start)
@@ -222,6 +225,9 @@ def variants_private():
         except KeyError as e:
             logger.exception(e)
             return abort(406)
+        except TypeError as e:
+            logger.exception(e)
+            return abort(406, 'Invalid type or data not supplied.')
 
         try:
             response = {'result': list(chromosome_results)}

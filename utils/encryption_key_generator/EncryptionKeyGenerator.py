@@ -19,6 +19,12 @@ class EncryptionKeyGenerator(object):
         with open('temp.json', 'w') as file:
             json.dump(data, file)
 
+    def load_encryption_key(self):
+        with open('temp.json', 'r') as file:
+            data = json.load(file)
+
+        self.encryption_key = data['encryption_key']
+
     @staticmethod
     def get_encryption_key():
         with open('temp.json', 'r') as file:
