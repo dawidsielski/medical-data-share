@@ -21,7 +21,7 @@ logger.setLevel(logging.INFO)
 
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(funcName)s:%(message)s')
 
-file_handler = logging.FileHandler('logs/ngs.log')
+file_handler = logging.FileHandler('logs/data_share_website.log')
 file_handler.setLevel(logging.INFO)
 file_handler.setFormatter(formatter)
 
@@ -30,7 +30,7 @@ logger.addHandler(file_handler)
 
 @server.route("/")
 def home():
-    logger.info("Runs page rendered.")
+    logger.info("Home page rendered.")
     data = {
         'lab_name': config.get('NODE', 'LABORATORY_NAME')
     }

@@ -14,7 +14,6 @@ def check_folder(folder_name):
     """
     This function makes a folder needed for application to run correctly.
     :param folder_name: str
-    :return: None
     """
     if not os.path.isdir(folder_name):
         os.mkdir(folder_name)
@@ -36,7 +35,7 @@ if __name__ == '__main__':
     ekg = EncryptionKeyGenerator()
     ekg.generate_and_save()
 
-    from ngs.ngs import server
+    from data_share_website.data_share_website import server
 
     if int(os.environ.get('FLASK_DEBUG', 0)):
         server.run(debug=True, port=8080, host='0.0.0.0')
