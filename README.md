@@ -13,6 +13,8 @@ Depending on your laboratory you will have to fill in the variables inside.
 Variables you will have to set are:
 * LABORATORY_NAME - this name will be displayed on a website
 * NODE_ADDRESS - this is an address for this node
+* TIMEZONE - this is a timezone variable
+* MAX_PUBLIC_VARIANT_REQUEST_LIMIT - this holds daily limit for public requests
 
 ### Prerequisites
 
