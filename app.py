@@ -32,4 +32,4 @@ if __name__ == '__main__':
     if int(os.environ.get('FLASK_DEBUG', 0)):
         server.run(debug=True, port=8080, host='0.0.0.0')
     else:
-        server.run(host='0.0.0.0')
+        server.run(host='0.0.0.0', port=80)

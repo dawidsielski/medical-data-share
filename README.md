@@ -45,4 +45,4 @@ TODO
 
 ## Acknowledgments
 
-TODO
+Special thanks to my supervisor Pawel Sztromwasser
