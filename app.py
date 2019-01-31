@@ -1,11 +1,15 @@
 import os
 
 from apscheduler.schedulers.background import BackgroundScheduler
+from configparser import ConfigParser
 
 from data_share.KeyGeneration import KeyGeneration
 from nodes_available.NodesChecker import NodesChecker
 from utils.public_variants_handler.PublicVariantsHandler import PublicVariantsHandler
 from utils.encryption_key_generator.EncryptionKeyGenerator import EncryptionKeyGenerator
+
+config = ConfigParser()
+config.read(os.path.join(os.getcwd(), 'config.ini'), encoding='utf-8')
 
 FOLDERS = ['logs', 'data_acquisition', 'nodes', 'keys']
 
@@ -19,7 +23,7 @@ def check_folder(folder_name):
         os.mkdir(folder_name)
 
 
-sched = BackgroundScheduler(daemon=True, timezone='Europe/Warsaw')
+sched = BackgroundScheduler(daemon=True, timezone=config.get('NODE', 'TIMEZONE'))
 sched.add_job(NodesChecker.get_all_nodes_availability, 'interval', minutes=1)
 sched.add_job(PublicVariantsHandler.reset_limit, 'cron', day='*')
 sched.start()
