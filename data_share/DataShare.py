@@ -90,17 +90,3 @@ class DataShare(object):
     @staticmethod
     def prepare_data_for_sending(data):
         return json.dumps(data)
-
-
-if __name__ == '__main__':
-    ds = DataShare()
-    d = {
-        "data": "9cef4a8384657fb6f2f7b66218251734",
-        "name": "Laboratory-Warsaw",
-    }
-    signature = ds.get_signature_for_message(d)
-
-    print(signature)
-
-    x = ds.validate_signature(d, signature)
-    print(x)

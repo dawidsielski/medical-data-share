@@ -8,7 +8,7 @@ class EncryptionKeyGenerator(object):
         self.encryption_key = ''
 
     def generate_encryption_key(self, length=32):
-        self.encryption_key = secrets.token_urlsafe(length)
+        self.encryption_key = secrets.token_urlsafe(length)[:32]
 
     def save_encryption_key(self):
         with open('temp.json', 'r') as file:
