@@ -19,7 +19,7 @@ def check_folder(folder_name):
         os.mkdir(folder_name)
 
 
-sched = BackgroundScheduler(daemon=True)
+sched = BackgroundScheduler(daemon=True, timezone='Europe/Warsaw')
 sched.add_job(NodesChecker.get_all_nodes_availability, 'interval', minutes=1)
 sched.add_job(PublicVariantsHandler.reset_limit, 'cron', day='*')
 sched.start()
