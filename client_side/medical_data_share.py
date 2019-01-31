@@ -38,7 +38,7 @@ if __name__ == '__main__':
     parser.add_argument('-ch', '--chrom', type=int, help='Chromosome number.')
     parser.add_argument('--start', type=int, help='Starting position.')
     parser.add_argument('--stop', type=int, help='Ending position.')
-    parser.add_argument('-s', '--save', action='store_true', help=)
+    parser.add_argument('-s', '--save', action='store_true')
     parser.add_argument('-v', '--verbose', action='store_true')
 
     args = parser.parse_args()
