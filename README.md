@@ -31,6 +31,20 @@ pip3 install -r requirements.txt
 
 When everything is installed you have to change directory to `medical-data-share`. Then just run `python3 app.py`.
 
+### Dockerfile
+
+If you want to use docker there is a Dockerfile provided.
+
+To build the image it you have to run:
+```
+docker build --tag datashare .
+```
+
+Starting container:
+```
+docker run --name medical-data-share -p 80:80 -d datashare
+```
+
 ## Authors
 
 * **Dawid Sielski** - *Initial work* - [Dawid Sielski](https://github.com/dawidsielski)
