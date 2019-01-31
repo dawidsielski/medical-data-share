@@ -14,65 +14,26 @@ Variables you will have to set are:
 * LABORATORY_NAME - this name will be displayed on a website
 * NODE_ADDRESS - this is an address for this node
 
-The most important part is to set up an environment variable called `ENCRYPTION_KEY`.
-This key is used to endrypt data that are shared between the nodes. 
-
 ### Prerequisites
 
+In order to run this application you have to have `python3` installed together with `python3-pip`.
+
+### Installing
 In order to run this app you have to install `requirements.txt` file by running:
 ```
 pip3 install -r requirements.txt
 ```
 
-### Installing
+### Running
+When everything is installed you have to change directory to `medical-data-share`. Then just run `python3 app.py`.
 
-A step by step series of examples that tell you how to get a development env running
+### Dockerfile
 
-Say what the step will be
-
+There is dockerfile provided. 
+Example usage:
 ```
-Give the example
+TODO
 ```
-
-And repeat
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
-
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-
-## Built With
-
-
-## Contributing
-
-
-## Versioning
-
 
 ## Authors
 
