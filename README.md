@@ -2,11 +2,17 @@
 
 DataShare is an online tool for sharing medical variants information.
 
+This application gives two interfaces. One is public in which there is a limited amount of requests per day.
+The private one which gives several options for variants data request.
+
 ## Getting Started
 
 Before running the app there are you have to perform some setup.
 
-First clone the repo by running `git clone`.
+First clone the repo by running
+ ```
+ git clone https://github.com/dawidsielski/medical-data-share.git
+ ```
 Then in the folder you will see file called `config.ini`. 
 Depending on your laboratory you will have to fill in the variables inside.
 
