@@ -10,6 +10,7 @@ from flask import Flask, render_template, redirect, url_for, jsonify, request, a
 from data_share.DataShare import DataShare
 from variant_db.TabixedTableVarinatDB import TabixedTableVarinatDB
 from utils.public_variants_handler.PublicVariantsHandler import PublicVariantsHandler
+from utils.request_id_generator.RequestIdGenerator import RequestIdGenerator
 
 config = ConfigParser()
 config.read(os.path.join(os.getcwd(), 'config.ini'), encoding='utf-8')
@@ -175,7 +176,10 @@ def variants_public():
 
         try:
             chromosome_results = TabixedTableVarinatDB.get_variants(chrom, start, start)
-            response = {'result': list(chromosome_results)}
+            response = {
+                'request_id': RequestIdGenerator.generate_random_id(),
+                'result': list(chromosome_results)
+            }
             PublicVariantsHandler.decrease_number_of_requests_left()
             return json.dumps(response), 200
         except Exception as e:
@@ -230,7 +234,10 @@ def variants_private():
             return abort(406, 'Invalid type or data not supplied.')
 
         try:
-            response = {'result': list(chromosome_results)}
+            response = {
+                'request_id': RequestIdGenerator.generate_random_id(),
+                'result': list(chromosome_results)
+            }
             return json.dumps(response), 200
         except Exception as e:
             logger.exception(e)
