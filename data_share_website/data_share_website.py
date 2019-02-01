@@ -160,6 +160,7 @@ def variants_public():
     """
     if request.method == 'POST':
         if PublicVariantsHandler.get_limit_left() <= 0:
+            logger.info("Public request reached.")
             abort(400, 'Limit reached.')
 
         try:
@@ -181,6 +182,7 @@ def variants_public():
                 'result': list(chromosome_results)
             }
             PublicVariantsHandler.decrease_number_of_requests_left()
+            logger.info('{} - {}'.format(response['request_id'], params))
             return json.dumps(response), 200
         except Exception as e:
             logger.exception(e)
@@ -238,6 +240,7 @@ def variants_private():
                 'request_id': RequestIdGenerator.generate_random_id(),
                 'result': list(chromosome_results)
             }
+            logger.info('{} - {}'.format(response['request_id'], params))
             return json.dumps(response), 200
         except Exception as e:
             logger.exception(e)
