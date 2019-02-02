@@ -23,11 +23,12 @@ logger.setLevel(logging.INFO)
 
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(funcName)s:%(message)s')
 
-file_handler = logging.FileHandler('logs/data_share_website.log')
-file_handler.setLevel(logging.INFO)
-file_handler.setFormatter(formatter)
+website_file_rotating_handler = TimedRotatingFileHandler('logs/website/data_haring_website.log', when="midnight", interval=1)
+website_file_rotating_handler.setLevel(logging.INFO)
+website_file_rotating_handler.setFormatter(formatter)
+website_file_rotating_handler.suffix = "%Y-%m-%d"
 
-logger.addHandler(file_handler)
+logger.addHandler(website_file_rotating_handler)
 
 data_sharing_logger = logging.getLogger('data_sharing')
 data_sharing_logger.setLevel(logging.INFO)

@@ -11,7 +11,7 @@ from utils.encryption_key_generator.EncryptionKeyGenerator import EncryptionKeyG
 config = ConfigParser()
 config.read(os.path.join(os.getcwd(), 'config.ini'), encoding='utf-8')
 
-FOLDERS = ['logs', 'data_acquisition', 'nodes', 'keys', 'logs/data_sharing']
+FOLDERS = ['logs', 'data_acquisition', 'nodes', 'keys', 'logs/data_sharing', 'logs/website']
 
 
 def check_folder(folder_name):
