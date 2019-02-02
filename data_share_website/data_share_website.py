@@ -4,6 +4,7 @@ import os
 import datetime
 import base64
 
+from logging.handlers import TimedRotatingFileHandler
 from configparser import ConfigParser
 from flask import Flask, render_template, redirect, url_for, jsonify, request, abort
 
@@ -28,13 +29,22 @@ file_handler.setFormatter(formatter)
 
 logger.addHandler(file_handler)
 
+data_sharing_logger = logging.getLogger('data_sharing')
+data_sharing_logger.setLevel(logging.INFO)
+
+data_sharing_file_rotating_handler = TimedRotatingFileHandler('logs/data_sharing/data_sharing.log', when="midnight", interval=1)
+data_sharing_file_rotating_handler.setLevel(logging.INFO)
+data_sharing_file_rotating_handler.setFormatter(formatter)
+data_sharing_file_rotating_handler.suffix = "%Y-%m-%d"
+data_sharing_logger.addHandler(data_sharing_file_rotating_handler)
+
 
 @server.route("/")
 def home():
-    logger.info("Home page rendered.")
     data = {
         'lab_name': config.get('NODE', 'LABORATORY_NAME')
     }
+    logger.info("Home page rendered.")
     return render_template('index.html', **data)
 
 
@@ -182,7 +192,7 @@ def variants_public():
                 'result': list(chromosome_results)
             }
             PublicVariantsHandler.decrease_number_of_requests_left()
-            logger.info('{} - {}'.format(response['request_id'], params))
+            data_sharing_logger.info('{} - {}'.format(response['request_id'], params))
             return json.dumps(response), 200
         except Exception as e:
             logger.exception(e)
@@ -192,6 +202,7 @@ def variants_public():
         'lab_name': config.get('NODE', 'LABORATORY_NAME'),
         'current_limit': PublicVariantsHandler.get_limit_left()
     }
+    logger.info('Variants public page')
     return render_template('public_variants.html', **data)
 
 
@@ -240,7 +251,7 @@ def variants_private():
                 'request_id': RequestIdGenerator.generate_random_id(),
                 'result': list(chromosome_results)
             }
-            logger.info('{} - {}'.format(response['request_id'], params))
+            data_sharing_logger.info('{} - {}'.format(response['request_id'], params))
             return json.dumps(response), 200
         except Exception as e:
             logger.exception(e)
@@ -249,6 +260,7 @@ def variants_private():
     data = {
         'lab_name': config.get('NODE', 'LABORATORY_NAME')
     }
+    logger.info("Private variants rendered")
     return render_template('private_variants.html', **data)
 
 
