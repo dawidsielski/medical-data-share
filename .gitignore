@@ -241,6 +241,7 @@ nodes_available/nodes_available.json
 nodes
 keys
 data
+logs
 
 # temp files
 temp.json

@@ -79,6 +79,18 @@ def send_data():
     return jsonify(response), 200
 
 
+@server.route('/sample-request')
+def sample_request():
+    data = {
+        "chrom": 21,
+        "start": 9825697,
+        "end": 9825800,
+    }
+    data = dict(sorted(data.items()))
+    data.update({'signature': DataShare.get_signature_for_message(data)})
+    return jsonify(data), 200
+
+
 @server.route("/data", methods=['GET', 'POST'])
 def receive_data():
     """
@@ -189,7 +201,9 @@ def variants_public():
         try:
             chromosome_results = TabixedTableVarinatDB.get_variants(chrom, start, start)
             response = {
+
                 'request_id': RequestIdGenerator.generate_random_id(),
+                'lab_name': config.get('NODE', 'LABORATORY_NAME'),
                 'result': list(chromosome_results)
             }
             PublicVariantsHandler.decrease_number_of_requests_left()
@@ -226,8 +240,16 @@ def variants_private():
     Having problems with running tabix will result in 500 internal error status code.
     """
     if request.method == 'POST':
+        params = request.get_json()
         try:
-            params = request.get_json()
+            if not DataShare.validate_signature(params):
+                data_sharing_logger.info("Invalid signature.")
+                abort(403, "Invalid signature.")
+        except KeyError:
+            data_sharing_logger.info("Signature not provided.")
+            abort(406, "Invalid data supplied.")
+
+        try:
             param_keys = params.keys()
             genome_build = 'hg19'  # this will be hg19 or hg38
 
@@ -241,21 +263,22 @@ def variants_private():
                 chromosome_results = []
 
         except KeyError as e:
-            logger.exception(e)
+            data_sharing_logger.exception(e)
             return abort(406)
         except TypeError as e:
-            logger.exception(e)
+            data_sharing_logger.exception(e)
             return abort(406, 'Invalid type or data not supplied.')
 
         try:
             response = {
                 'request_id': RequestIdGenerator.generate_random_id(),
+                'lab_name': config.get('NODE', 'LABORATORY_NAME'),
                 'result': list(chromosome_results)
             }
             data_sharing_logger.info('{} - {}'.format(response['request_id'], params))
             return json.dumps(response), 200
         except Exception as e:
-            logger.exception(e)
+            data_sharing_logger.exception(e)
             return abort(500)
 
     data = {

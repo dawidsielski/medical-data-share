@@ -2,6 +2,8 @@ import requests
 import argparse
 import json
 
+from data_share.DataShare import DataShare
+
 
 def prepare_public_request(chrom=None, start=None, end=None):
     data = {
@@ -13,7 +15,10 @@ def prepare_public_request(chrom=None, start=None, end=None):
 
 
 def data_request(endpoint, chrom=None, start=None, end=None):
-    return requests.post(endpoint, json=prepare_public_request(chrom, start, end))
+    data = prepare_public_request(chrom, start, end)
+    data = dict(sorted(data.items()))
+    data.update({'signature': DataShare.get_signature_for_message(data)})
+    return requests.post(endpoint, json=data)
 
 
 def handle_request(r, args):
@@ -25,6 +30,9 @@ def handle_request(r, args):
             with open('data.json', 'w') as file:
                 json.dump(json.loads(r.text), file)
             print('File has been saved.')
+    else:
+        print(r.status_code)
+        print(r.text)
 
 
 if __name__ == '__main__':
@@ -38,8 +46,9 @@ if __name__ == '__main__':
     parser.add_argument('-ch', '--chrom', type=int, help='Chromosome number.')
     parser.add_argument('--start', type=int, help='Starting position.')
     parser.add_argument('--stop', type=int, help='Ending position.')
+
     parser.add_argument('-s', '--save', action='store_true')
-    parser.add_argument('-v', '--verbose', action='store_true')
+    parser.add_argument('-v', '--verbose', action='store_true', default=True)
 
     args = parser.parse_args()
     print(args)
@@ -51,11 +60,3 @@ if __name__ == '__main__':
     elif args.private:
         r = data_request(args.endpoint, args.chrom, args.start, args.stop)
         handle_request(r, args)
-
-
-# python3 medical_data_share.py --public -e http://localhost:8080/variants
-# python3 medical_data_share.py --public -e http://localhost:8080/variants -s
-# python3 medical_data_share.py --public -e http://localhost:8080/variants -s --chr 21 --start 9825797
-
-# python3 medical_data_share.py --private -e http://localhost:8080/variants-private -s --chr 21 --start 9825797 --stop 9825850
-# python3 medical_data_share.py --private -e http://localhost:8080/variants-private -s --chr 21
