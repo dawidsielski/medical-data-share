@@ -14,6 +14,11 @@ def prepare_public_request(chrom=None, start=None, end=None):
     return data
 
 
+def data_request_public(endpoint, chrom=None, start=None, end=None):
+    data = prepare_public_request(chrom, start, end)
+    return requests.post(endpoint, json=data)
+
+
 def data_request(endpoint, chrom=None, start=None, end=None):
     data = prepare_public_request(chrom, start, end)
     data = dict(sorted(data.items()))
@@ -55,7 +60,7 @@ if __name__ == '__main__':
 
     if args.public:
         if args.chrom and args.start:
-            r = data_request(args.endpoint, args.chrom, args.start)
+            r = data_request_public(args.endpoint, args.chrom, args.start)
             handle_request(r, args)
     elif args.private:
         r = data_request(args.endpoint, args.chrom, args.start, args.stop)
