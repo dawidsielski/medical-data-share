@@ -23,5 +23,4 @@ class PublicKeyPreparation(object):
     def get_user_id():
         with open(os.path.join('keys', 'user_id'), 'r') as file:
             uid = file.readline()
-        print(uid)
         return uid

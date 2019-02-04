@@ -45,6 +45,24 @@ def handle_request(r, args):
         print(r.text)
 
 
+def handle_keys_generation():
+    if os.listdir('keys'):
+        choice = input("Keys are generated. Do you want to generate new ones? [y or n](default n)")
+        if choice in ['n', 'N', 'NO', 'No']:
+            print("No keys generated.")
+            sys.exit(0)
+        elif choice in ['y', 'Y', 'YES', 'Yes']:
+            print("New keys generated.")
+            pass
+        else:
+            print("Wrong input. Try again.")
+            sys.exit(0)
+
+    keys = KeyGeneration()
+    keys.load_or_generate()
+    PublicKeyPreparation.prepare_public_key()
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
@@ -72,19 +90,4 @@ if __name__ == '__main__':
         r = data_request(args.endpoint, args.chrom, args.start, args.stop)
         handle_request(r, args)
     elif args.generate:
-
-        if os.listdir('keys'):
-            choice = input("Keys are generated. Do you want to generate new ones? [y or n](default n)")
-            if choice in ['n', 'N', 'NO', 'No']:
-                print("No keys generated.")
-                sys.exit(0)
-            elif choice in ['y', 'Y', 'YES', 'Yes']:
-                print("New keys generated.")
-                pass
-            else:
-                print("Wrong input. Try again.")
-                sys.exit(0)
-
-        keys = KeyGeneration()
-        keys.load_or_generate()
-        user_id = PublicKeyPreparation.prepare_public_key()
+        handle_keys_generation()
