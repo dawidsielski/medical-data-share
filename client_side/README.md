@@ -21,9 +21,31 @@ pip3 install pycrypto
 
 ### Running
 
-The script runs feom command line by running `python3 medical_data_share.py`.
+Before you start you have to generate your own public and private keys by running
 
-There exist several options available.
+```buildoutcfg
+python3 medical_data_share.py -g
+```
+or
+```buildoutcfg
+python3 medical_data_share.py --generate
+```
+This will generate public and private key together with user id.
+
+Once you have done it in folder `keys/` there will be thee files. These are:
+* `private.key`
+* `public.<your-user-id>.key`
+* `user_id` - holds only your user_id
+
+At this point you will have to ask an administrator to add you to the server.
+
+Once this is done you are able to make private requests to server.
+
+If you are not added to the server you are only allowed to perform public operations.
+
+### Getting the data
+
+Once you are set up you can run this script with several options.
 
 The available options are:
 * `--public` this will perform request for publicly available data
