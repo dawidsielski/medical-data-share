@@ -12,6 +12,7 @@ from data_share.DataShare import DataShare
 from variant_db.TabixedTableVarinatDB import TabixedTableVarinatDB
 from utils.public_variants_handler.PublicVariantsHandler import PublicVariantsHandler
 from utils.request_id_generator.RequestIdGenerator import RequestIdGenerator
+from utils.request_id_generator.RandomIdGenerator import RandomIdGenerator
 
 config = ConfigParser()
 config.read(os.path.join(os.getcwd(), 'config.ini'), encoding='utf-8')
@@ -82,6 +83,7 @@ def send_data():
 @server.route('/sample-request')
 def sample_request():
     data = {
+        "uid": RandomIdGenerator.generate_random_id(64),
         "chrom": 21,
         "start": 9825697,
         "end": 9825800,
@@ -242,12 +244,12 @@ def variants_private():
     if request.method == 'POST':
         params = request.get_json()
         try:
-            if not DataShare.validate_signature(params):
-                data_sharing_logger.info("Invalid signature.")
+            if not DataShare.validate_signature_using_user_id(params):
+                data_sharing_logger.info("Invalid signature. User id:{}".format(params['user_id']))
                 abort(403, "Invalid signature.")
         except KeyError:
             data_sharing_logger.info("Signature not provided.")
-            abort(406, "Invalid data supplied.")
+            abort(406, "Invalid data supplied. User id:{}".format(params['user_id']))
 
         try:
             param_keys = params.keys()

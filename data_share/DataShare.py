@@ -70,6 +70,30 @@ class DataShare(object):
         return public_key.verify(h, signature)
 
     @staticmethod
+    def validate_signature_using_user_id(message, signature=None):
+        """
+        This function checks if incoming message is valid for this machine.
+        :param message: (obj) json incoming message
+        :param signature:
+        :return:
+        """
+        if signature is None:
+            signature = message.pop('signature')
+
+        signature = (int(base64.b64decode(signature).decode()),)
+
+        user_id = message['user_id']
+
+        message = json.dumps(message)
+        public_key_path = os.path.join('public_keys', f'public.{user_id}.key')
+        with open(public_key_path, 'rb') as file:
+            public_key = RSA.importKey(file.read())
+
+        h = SHA.new(message.encode()).digest()
+
+        return public_key.verify(h, signature)
+
+    @staticmethod
     def get_signature_for_message(message):
         """
         This function prepares signature for the message.
