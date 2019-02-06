@@ -14,6 +14,7 @@ from variant_db.TabixedTableVarinatDB import TabixedTableVarinatDB
 from utils.public_variants_handler.PublicVariantsHandler import PublicVariantsHandler
 from utils.request_id_generator.RequestIdGenerator import RequestIdGenerator
 from utils.request_id_generator.RandomIdGenerator import RandomIdGenerator
+from utils.encryption_key_generator.EncryptionKeyGenerator import EncryptionKeyGenerator
 
 config = ConfigParser()
 config.read(os.path.join(os.getcwd(), 'config.ini'), encoding='utf-8')
@@ -291,7 +292,8 @@ def variants_private():
             response = {
                 'request_id': RequestIdGenerator.generate_random_id(),
                 'lab_name': config.get('NODE', 'LABORATORY_NAME'),
-                'result': list(chromosome_results)
+                'encryption_key': DataShare.encrypt_using_public_key(EncryptionKeyGenerator.get_encryption_key(), params['user_id']),
+                'result': DataShare.encrypt_data(json.dumps(list(chromosome_results)))
             }
             data_sharing_logger.info('{} - {}'.format(response['request_id'], params))
             return json.dumps(response), 200

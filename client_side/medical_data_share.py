@@ -93,6 +93,13 @@ if __name__ == '__main__':
             handle_request(r, args)
     elif args.endpoint.endswith('variants-private'):
         r = data_request(args.endpoint, args.chrom, args.start, args.stop)
+        message = json.loads(r.text)
+        encryption_key = bytes.fromhex(message['encryption_key'])
+        encryption_key = DataShare.decrypt_using_private_key(encryption_key)
+
+        decrypted_data = json.loads(DataShare.decrypt_data(message['result'], encryption_key))
+        print(decrypted_data)
+
         handle_request(r, args)
     elif args.generate:
         handle_keys_generation()

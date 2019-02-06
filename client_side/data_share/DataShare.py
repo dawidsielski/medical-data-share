@@ -2,7 +2,7 @@ import os
 import json
 import base64
 
-from Crypto.Cipher import AES
+from Crypto.Cipher import AES, PKCS1_OAEP
 from data_share.Pad import Pad
 from .EncryptionKeyGenerator import EncryptionKeyGenerator
 
@@ -16,15 +16,16 @@ class DataShare(object):
     """
 
     @staticmethod
-    def decrypt_data(data):
+    def decrypt_data(data, encryption_key):
         """
         The function takes data argument and decrypts it using ENCRYPTION_KEY. It also unpads the data to be prepared
         for saving
         :param data: (str)
+        :param encryption_key: (str)
         :return: (str)
         """
         assert isinstance(data, str)
-        obj = AES.new(EncryptionKeyGenerator().get_encryption_key(), AES.MODE_CBC, 'This is an IV456')
+        obj = AES.new(encryption_key, AES.MODE_CBC, 'This is an IV456')
         bytes_data = bytes.fromhex(data)
         return Pad.unpad(obj.decrypt(bytes_data)).decode()
 
@@ -81,6 +82,26 @@ class DataShare(object):
         signature = private_key.sign(h, '')
 
         return base64.b64encode(bytes(str(signature[0]).encode()))
+
+    @staticmethod
+    def encrypt_using_public_key(message, user_id):
+        public_key_path = os.path.join('public_keys', f'public.{user_id}.key')
+        with open(public_key_path, 'rb') as file:
+            public_key = RSA.importKey(file.read())
+
+        cipher = PKCS1_OAEP.new(public_key)
+        encrypted = cipher.encrypt(message.encode())
+        return encrypted.hex()
+
+    @staticmethod
+    def decrypt_using_private_key(message):
+        public_key_path = os.path.join('keys', 'private.key')
+        with open(public_key_path, 'rb') as file:
+            private_key = RSA.importKey(file.read())
+
+        cipher = PKCS1_OAEP.new(private_key)
+        encrypted = cipher.decrypt(message)
+        return encrypted.decode()
 
     @staticmethod
     def prepare_data_for_sending(data):
