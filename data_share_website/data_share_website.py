@@ -3,6 +3,7 @@ import logging
 import os
 import datetime
 import base64
+import re
 
 from logging.handlers import TimedRotatingFileHandler
 from configparser import ConfigParser
@@ -191,14 +192,26 @@ def variants_public():
         try:
             params = request.get_json()
             genome_build = 'hg19'  # this will be hg19 or hg38
-            chrom = params['chrom']
-            start = params['start']
+
+            if 'query' in params:
+                pattern = re.compile(r'(?P<CHROM>(\d+))[ :](?P<START>(\d+))([ :](?P<STOP>\d+))?')
+                s = re.search(pattern, params['query'])
+                chrom, start = int(s.group('CHROM')), int(s.group('START'))
+            else:
+                chrom = params['chrom']
+                start = params['start']
         except KeyError as e:
             logger.exception(e)
             return abort(406)
         except TypeError as e:
             logger.exception(e)
             return abort(406, 'Invalid type or data not supplied.')
+        except AttributeError as e:
+            logger.exception(e)
+            return abort(406, 'Invalid type or data not supplied.')
+        except Exception as e:
+            logger.exception(e)
+            return abort(500)
 
         try:
             chromosome_results = TabixedTableVarinatDB.get_variants(chrom, start, start)

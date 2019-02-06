@@ -3,6 +3,7 @@ import argparse
 import json
 import os
 import sys
+import re
 
 from data_share.DataShare import DataShare
 from data_share.KeyGeneration import KeyGeneration
@@ -69,6 +70,7 @@ if __name__ == '__main__':
     parser.add_argument('-g', '--generate', action='store_true', help='Generates public and private key together with user id.')
 
     parser.add_argument('-e', '--endpoint', help='Endpoint to which request is performed.', default="")
+    parser.add_argument('-q', '--query', type=str)
     parser.add_argument('-ch', '--chrom', type=int, help='Chromosome number.')
     parser.add_argument('--start', type=int, help='Starting position.')
     parser.add_argument('--stop', type=int, help='Ending position.')
@@ -82,6 +84,12 @@ if __name__ == '__main__':
     if args.endpoint.endswith('variants'):
         if args.chrom and args.start:
             r = data_request_public(args.endpoint, args.chrom, args.start)
+            handle_request(r, args)
+        elif args.query:
+            pattern = re.compile(r'(?P<CHROM>(\d+))[ :](?P<START>(\d+))([ :](?P<STOP>\d+))?')
+            s = re.search(pattern, args.query)
+            chrom, start = int(s.group('CHROM')), int(s.group('START'))
+            r = data_request_public(args.endpoint, chrom, start)
             handle_request(r, args)
     elif args.endpoint.endswith('variants-private'):
         r = data_request(args.endpoint, args.chrom, args.start, args.stop)
