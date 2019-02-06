@@ -52,10 +52,28 @@ To successfully perform request you also have to specify:
 * `-ch` or `--chrom` specifies number of chromosome
 * `--start` starting position in chromosome
 * `--end` ending position in chromosome
+* `-q` or `--guery` simple query option for public requests
 
 By default program will display information gathered.
 
 If you want to save the output please add `-s` or `--save` option.
+
+#### Query option
+
+Query option is used only in public request.
+
+Examples:
+```
+python3 medical_data_share.py -e http://0.0.0.0:8080/variants -q "21 9825797"
+```
+or
+```
+python3 medical_data_share.py -e http://0.0.0.0:8080/variants -q "21:9825797"
+```
+
+There are two formats available for query:
+* `CHR:start[:stop]` - colon as seperator
+* `CHR start[ stop]` - space as separator
 
 ## Important note
 Public assess is restricted only for variants in a specific place. 
@@ -64,11 +82,11 @@ For private access you will have to have private key of the machine in order to 
 
 ### Examples:
 For public request:
-```buildoutcfg
+```
 python3 medical_data_share.py -e http://localhost:8080/variants -s --chr 21 --start 9825797
 ```
 For private request:
 
-```buildoutcfg
+```
 python3 medical_data_share.py -e http://localhost:8080/variants-private -s --chr 21
 ```
