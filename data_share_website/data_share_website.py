@@ -250,6 +250,9 @@ def variants_private():
         except KeyError:
             data_sharing_logger.info("Signature not provided.")
             abort(406, "Invalid data supplied. User id:{}".format(params['user_id']))
+        except FileNotFoundError:
+            data_sharing_logger.info("No public key supports this request.")
+            abort(400)
 
         try:
             param_keys = params.keys()

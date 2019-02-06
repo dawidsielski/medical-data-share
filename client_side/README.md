@@ -47,12 +47,8 @@ If you are not added to the server you are only allowed to perform public operat
 
 Once you are set up you can run this script with several options.
 
-The available options are:
-* `--public` this will perform request for publicly available data
-* `--private` this will perform request for private available data
-
 To successfully perform request you also have to specify:
-* `-e` or `--endpoint` address of the variants endoint
+* `-e` or `--endpoint` address of the variants endpoint (depending on a endpoint the request will be public or private)
 * `-ch` or `--chrom` specifies number of chromosome
 * `--start` starting position in chromosome
 * `--end` ending position in chromosome
@@ -67,10 +63,12 @@ Public assess is restricted only for variants in a specific place.
 For private access you will have to have private key of the machine in order to sign the message.
 
 ### Examples:
+For public request:
 ```buildoutcfg
-python3 medical_data_share.py --public -e http://localhost:8080/variants -s --chr 21 --start 9825797
+python3 medical_data_share.py -e http://localhost:8080/variants -s --chr 21 --start 9825797
 ```
+For private request:
 
 ```buildoutcfg
-python3 medical_data_share.py --private -e http://localhost:8080/variants-private -s --chr 21
+python3 medical_data_share.py -e http://localhost:8080/variants-private -s --chr 21
 ```

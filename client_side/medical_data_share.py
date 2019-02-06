@@ -66,12 +66,9 @@ def handle_keys_generation():
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument('-g', '--generate', action='store_true', help='Generates public and private key together with user id.')
-    group.add_argument('--public', action='store_true', default=False)
-    group.add_argument('--private', action='store_true', default=False)
+    parser.add_argument('-g', '--generate', action='store_true', help='Generates public and private key together with user id.')
 
-    parser.add_argument('-e', '--endpoint', help='Endpoint to which request is performed.')
+    parser.add_argument('-e', '--endpoint', help='Endpoint to which request is performed.', default="")
     parser.add_argument('-ch', '--chrom', type=int, help='Chromosome number.')
     parser.add_argument('--start', type=int, help='Starting position.')
     parser.add_argument('--stop', type=int, help='Ending position.')
@@ -82,11 +79,11 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print(args)
 
-    if args.public:
+    if args.endpoint.endswith('variants'):
         if args.chrom and args.start:
             r = data_request_public(args.endpoint, args.chrom, args.start)
             handle_request(r, args)
-    elif args.private:
+    elif args.endpoint.endswith('variants-private'):
         r = data_request(args.endpoint, args.chrom, args.start, args.stop)
         handle_request(r, args)
     elif args.generate:
