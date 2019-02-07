@@ -289,11 +289,15 @@ def variants_private():
             return abort(406, 'Invalid type or data not supplied.')
 
         try:
+            encryption_key_generator = EncryptionKeyGenerator()
+            encryption_key_generator.generate_encryption_key()
+            _new_encryption_key = encryption_key_generator.encryption_key
+
             response = {
                 'request_id': RequestIdGenerator.generate_random_id(),
                 'lab_name': config.get('NODE', 'LABORATORY_NAME'),
-                'encryption_key': DataShare.encrypt_using_public_key(EncryptionKeyGenerator.get_encryption_key(), params['user_id']),
-                'result': DataShare.encrypt_data(json.dumps(list(chromosome_results)))
+                'encryption_key': DataShare.encrypt_using_public_key(_new_encryption_key, params['user_id']),
+                'result': DataShare.encrypt_data(json.dumps(list(chromosome_results)), _new_encryption_key)
             }
             data_sharing_logger.info('{} - {}'.format(response['request_id'], params))
             return json.dumps(response), 200

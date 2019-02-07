@@ -37,14 +37,14 @@ class DataShare(object):
         return Pad.unpad(obj.decrypt(bytes_data)).decode()
 
     @staticmethod
-    def encrypt_data(data):
+    def encrypt_data(data, encryption_key):
         """
         This function encrypts data and prepares it for sending.
         :param data: (str) holds unprocessed data to be send
         :return: (str) data ready to be send
         """
         assert isinstance(data, str)
-        obj = AES.new(EncryptionKeyGenerator().get_encryption_key(), AES.MODE_CBC, 'This is an IV456')
+        obj = AES.new(encryption_key, AES.MODE_CBC, 'This is an IV456')
         padded = Pad.pad(data.encode())
         ciphertext = obj.encrypt(padded)
         return ciphertext.hex()
