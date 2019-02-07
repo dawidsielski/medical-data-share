@@ -34,13 +34,24 @@ def data_request(endpoint, chrom=None, start=None, end=None):
 
 def handle_request(r, args):
     if r.status_code == 200:
-        if args.verbose:
-            print(r.text)
+        obtained_data = json.loads(r.text)
+
+        if args.raw:
+            print('Raw response:')
+            print(obtained_data)
+
+        if 'encryption_key' in obtained_data:
+            obtained_data['result'] = decrypt_result(obtained_data)
+            obtained_data.pop('encryption_key')
 
         if args.save:
-            with open('data.json', 'w') as file:
-                json.dump(json.loads(r.text), file)
+            with open('{}.json'.format(obtained_data['request_id']), 'w') as file:
+                json.dump(obtained_data, file)
             print('File has been saved.')
+
+        if args.verbose:
+            print('Query result (after decryption):')
+            print(obtained_data['result'])
     else:
         print(r.status_code)
         print(r.text)
@@ -64,6 +75,19 @@ def handle_keys_generation():
     PublicKeyPreparation.prepare_public_key()
 
 
+def get_params_from_query(query):
+    pattern = re.compile(r'(?P<CHROM>(\d+))[ :](?P<START>(\d+))([ :](?P<STOP>\d+))?')
+    s = re.search(pattern, query)
+    return int(s.group('CHROM')), int(s.group('START'))
+
+
+def decrypt_result(message):
+    encryption_key = bytes.fromhex(message['encryption_key'])
+    encryption_key = DataShare.decrypt_using_private_key(encryption_key)
+    decrypted_data = json.loads(DataShare.decrypt_data(message['result'], encryption_key))
+    return decrypted_data
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
@@ -77,6 +101,7 @@ if __name__ == '__main__':
 
     parser.add_argument('-s', '--save', action='store_true')
     parser.add_argument('-v', '--verbose', action='store_true', default=True)
+    parser.add_argument('-r', '--raw', action='store_true', help='Will print raw response.')
 
     args = parser.parse_args()
     print(args)
@@ -86,20 +111,13 @@ if __name__ == '__main__':
             r = data_request_public(args.endpoint, args.chrom, args.start)
             handle_request(r, args)
         elif args.query:
-            pattern = re.compile(r'(?P<CHROM>(\d+))[ :](?P<START>(\d+))([ :](?P<STOP>\d+))?')
-            s = re.search(pattern, args.query)
-            chrom, start = int(s.group('CHROM')), int(s.group('START'))
+            chrom, start = get_params_from_query(args.query)
             r = data_request_public(args.endpoint, chrom, start)
             handle_request(r, args)
     elif args.endpoint.endswith('variants-private'):
         r = data_request(args.endpoint, args.chrom, args.start, args.stop)
         message = json.loads(r.text)
-        encryption_key = bytes.fromhex(message['encryption_key'])
-        encryption_key = DataShare.decrypt_using_private_key(encryption_key)
-
-        decrypted_data = json.loads(DataShare.decrypt_data(message['result'], encryption_key))
-        print(decrypted_data)
-
         handle_request(r, args)
+
     elif args.generate:
         handle_keys_generation()

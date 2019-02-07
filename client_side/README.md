@@ -53,8 +53,9 @@ To successfully perform request you also have to specify:
 * `--start` starting position in chromosome
 * `--end` ending position in chromosome
 * `-q` or `--guery` simple query option for public requests
+* `-r` or `--raw` will display raw response from the server
 
-By default program will display information gathered.
+By default program will display decrypted result of the query.
 
 If you want to save the output please add `-s` or `--save` option.
 
