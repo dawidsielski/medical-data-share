@@ -2,7 +2,6 @@ import json
 import logging
 import os
 import datetime
-import base64
 import re
 
 from logging.handlers import TimedRotatingFileHandler
@@ -10,10 +9,10 @@ from configparser import ConfigParser
 from flask import Flask, render_template, redirect, url_for, jsonify, request, abort
 
 from data_share.DataShare import DataShare
+from data_share.KeyGeneration import KeyGeneration
 from variant_db.TabixedTableVarinatDB import TabixedTableVarinatDB
 from utils.public_variants_handler.PublicVariantsHandler import PublicVariantsHandler
 from utils.request_id_generator.RequestIdGenerator import RequestIdGenerator
-from utils.request_id_generator.RandomIdGenerator import RandomIdGenerator
 from utils.encryption_key_generator.EncryptionKeyGenerator import EncryptionKeyGenerator
 
 config = ConfigParser()
@@ -121,7 +120,6 @@ def add_node():
     """
     if request.method == 'POST':
         data = request.get_json()
-        print(data)
         if not DataShare.validate_signature_using_user_id(data):
             logger.info('Invalid signature add-node')
             abort(403, 'Invalid signature.')
@@ -278,11 +276,35 @@ def variants_private():
     return render_template('private_variants.html', **data)
 
 
+def get_all_nodes_info():
+    nodes_path = os.path.join('nodes')
+    nodes = os.listdir(nodes_path)
+    my_keys = ['address', 'public-key']
+
+    nodes_information = {}
+    for node_path in [os.path.join(nodes_path, node) for node in nodes]:
+        with open(node_path, 'r') as file:
+            node_info = json.load(file)
+
+        nodes_information.update({node_info['laboratory-name']: {key: node_info[key] for key in my_keys}})
+
+    my_lab_name = config.get('NODE', 'LABORATORY_NAME')
+    my_lab_address = config.get('NODE', 'NODE_ADDRESS')
+    keys = KeyGeneration()
+    keys.load_keys()
+    my_public_key = keys.public_key
+    nodes_information.update({my_lab_name: {'address': my_lab_address, 'public-key': my_public_key}})
+    return nodes_information
+
+
 @server.route('/nodes', methods=['GET', 'POST'])
 def available_nodes():
     available_nodes_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'nodes_available', 'nodes_available.json')
     with open(available_nodes_path, 'r') as json_file:
         nodes = json.load(json_file)
+
+    if request.method == 'POST':
+        return jsonify(get_all_nodes_info())
 
     data = {
         'lab_name': config.get('NODE', 'LABORATORY_NAME')
