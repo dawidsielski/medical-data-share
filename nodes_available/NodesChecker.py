@@ -51,7 +51,7 @@ class NodesChecker(object):
                 'availability': NodesChecker.get_node_availability(node),
                 'address': node['address']
             }
-            node_availability[node['name']] = data
+            node_availability[node['laboratory-name']] = data
 
         if save:
             with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'nodes_available.json'), 'w') as json_file:

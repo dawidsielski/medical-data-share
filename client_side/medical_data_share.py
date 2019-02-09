@@ -5,6 +5,8 @@ import os
 import sys
 import re
 
+from pprint import pprint
+
 from data_share.DataShare import DataShare
 from data_share.KeyGeneration import KeyGeneration
 from utils.PublicKeyPreparation import PublicKeyPreparation
@@ -38,7 +40,7 @@ def handle_request(r, args):
 
         if args.raw:
             print('Raw response:')
-            print(obtained_data)
+            pprint(obtained_data)
 
         if 'encryption_key' in obtained_data:
             obtained_data['result'] = decrypt_result(obtained_data)
@@ -51,10 +53,10 @@ def handle_request(r, args):
 
         if args.verbose:
             print('Query result (after decryption):')
-            print(obtained_data['result'])
+            pprint(obtained_data['result'], width=300)
     else:
         print(r.status_code)
-        print(r.text)
+        pprint(r.text)
 
 
 def handle_keys_generation():
@@ -88,6 +90,32 @@ def decrypt_result(message):
     return decrypted_data
 
 
+def get_user_id():
+    with open('keys/user_id', 'r') as file:
+        user_id = file.read()
+    return user_id
+
+
+def load_public_key_for_sending(public_key_path):
+    with open(public_key_path, 'r') as file:
+        public_key = file.read()
+    return public_key
+
+
+def add_node(endpoint, public_key_path):
+    public_key = load_public_key_for_sending(public_key_path)
+    data = {
+        'laboratory-name': "Warsaw IMID",
+        'public-key': public_key,
+        'address': 'http://195.181.218.180/',
+        'user_id': get_user_id()
+    }
+    data = dict(sorted(data.items()))
+    data.update({'signature': DataShare.get_signature_for_message(data).decode()})
+    r = requests.post(endpoint, json=data)
+    print(r.status_code)
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
@@ -98,6 +126,9 @@ if __name__ == '__main__':
     parser.add_argument('-ch', '--chrom', type=int, help='Chromosome number.')
     parser.add_argument('--start', type=int, help='Starting position.')
     parser.add_argument('--stop', type=int, help='Ending position.')
+
+    parser.add_argument('-a', '--add-node', action='store_true')
+    parser.add_argument('-k', '--key', type=str)
 
     parser.add_argument('-s', '--save', action='store_true')
     parser.add_argument('-v', '--verbose', action='store_true', default=True)
@@ -118,6 +149,9 @@ if __name__ == '__main__':
         r = data_request(args.endpoint, args.chrom, args.start, args.stop)
         message = json.loads(r.text)
         handle_request(r, args)
+
+    elif args.add_node:
+        add_node(args.endpoint, args.key)
 
     elif args.generate:
         handle_keys_generation()

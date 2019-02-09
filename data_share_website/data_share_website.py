@@ -82,19 +82,6 @@ def send_data():
     return jsonify(response), 200
 
 
-@server.route('/sample-request')
-def sample_request():
-    data = {
-        "uid": RandomIdGenerator.generate_random_id(64),
-        "chrom": 21,
-        "start": 9825697,
-        "end": 9825800,
-    }
-    data = dict(sorted(data.items()))
-    data.update({'signature': DataShare.get_signature_for_message(data)})
-    return jsonify(data), 200
-
-
 @server.route("/data", methods=['GET', 'POST'])
 def receive_data():
     """
@@ -122,26 +109,6 @@ def receive_data():
     abort(403)
 
 
-@server.route('/sample-node', methods=['GET', 'POST'])
-def sample_node():
-    """
-    Sample node data
-    """
-    path = os.path.join('keys', 'public.key')
-    with open(path, 'rb') as file:
-        public_key = file.read()
-
-    response = {
-        'address': '0.0.0.0',
-        'name': 'Laboratory-Warsaw2',
-        'public_key': DataShare.encrypt_data(base64.b64encode(public_key).decode()),
-    }
-
-    response.update({'signature': DataShare.get_signature_for_message(response)})
-
-    return jsonify(response), 200
-
-
 @server.route('/add-node', methods=['GET', 'POST'])
 def add_node():
     """
@@ -153,16 +120,16 @@ def add_node():
     POST request must be signed. If it is not the node will not be added.
     """
     if request.method == 'POST':
-        data = json.loads(request.get_json())
-        if not DataShare.validate_signature(data):
+        data = request.get_json()
+        print(data)
+        if not DataShare.validate_signature_using_user_id(data):
             logger.info('Invalid signature add-node')
             abort(403, 'Invalid signature.')
 
-        with open(os.path.join('nodes', '{}.json'.format(data['name'])), 'w') as file:
-            json.dump(data, file)
+        data_sharing_logger.info('Add node: {}'.format(data))
 
-        with open(os.path.join('nodes', '{}.key'.format(data['name'])), 'w') as file:
-            file.write(base64.b64decode(DataShare.decrypt_data(data['public_key'])).decode())
+        with open(os.path.join('nodes', '{}.json'.format(data['laboratory-name'])), 'w') as file:
+            json.dump(data, file)
 
         return 'Success', 200
     abort(403)
@@ -290,6 +257,7 @@ def variants_private():
 
         try:
             _new_encryption_key = EncryptionKeyGenerator().generate_encryption_key()
+            data_sharing_logger.debug('Encryption key: {}'.format(_new_encryption_key))
 
             response = {
                 'request_id': RequestIdGenerator.generate_random_id(),
