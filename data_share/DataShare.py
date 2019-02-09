@@ -21,7 +21,7 @@ class DataShare(object):
     """
 
     @staticmethod
-    def decrypt_data(data, encryption_key=None):
+    def decrypt_data(data, encryption_key):
         """
         The function takes data argument and decrypts it using ENCRYPTION_KEY. It also unpads the data to be prepared
         for saving
@@ -30,8 +30,6 @@ class DataShare(object):
         :return: (str)
         """
         assert isinstance(data, str)
-        if encryption_key is None:
-            encryption_key = EncryptionKeyGenerator().get_encryption_key()
         obj = AES.new(encryption_key, AES.MODE_CBC, 'This is an IV456')
         bytes_data = bytes.fromhex(data)
         return Pad.unpad(obj.decrypt(bytes_data)).decode()

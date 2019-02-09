@@ -289,9 +289,7 @@ def variants_private():
             return abort(406, 'Invalid type or data not supplied.')
 
         try:
-            encryption_key_generator = EncryptionKeyGenerator()
-            encryption_key_generator.generate_encryption_key()
-            _new_encryption_key = encryption_key_generator.encryption_key
+            _new_encryption_key = EncryptionKeyGenerator().generate_encryption_key()
 
             response = {
                 'request_id': RequestIdGenerator.generate_random_id(),
