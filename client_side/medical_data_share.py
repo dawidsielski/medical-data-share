@@ -180,8 +180,17 @@ if __name__ == '__main__':
     elif args.nodes:
         available_laboratories = requests.post(args.endpoint).json()
 
-        for lab in available_laboratories:
-            name = lab['laboratory-name']
+        if args.save:
+            if not os.path.isdir('nodes'):
+                os.mkdir('nodes')
+            for lab in available_laboratories:
+                name = lab['laboratory-name']
 
-            with open('{}.json'.format(name), 'w') as file:
-                json.dump(lab, file)
+                with open(os.path.join('nodes', '{}.json'.format(name)), 'w') as file:
+                    json.dump(lab, file)
+
+                with open(os.path.join('nodes', 'public.{}.key'.format(name)), 'w') as file:
+                    file.writelines(lab['public-key'])
+
+        if args.verbose:
+            pprint(available_laboratories)
