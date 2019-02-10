@@ -2,14 +2,20 @@ import os
 import requests
 import json
 
+from configparser import ConfigParser
+
 NODES_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'nodes')
+
+config = ConfigParser()
+config.read(os.path.join(os.getcwd(), 'config.ini'), encoding='utf-8')
 
 
 class NodesChecker(object):
 
     @staticmethod
     def get_all_nodes():
-        return [node for node in os.listdir(NODES_PATH) if node.endswith(".json")]
+        this_node = config.get('NODE', 'LABORATORY_NAME')
+        return [node for node in os.listdir(NODES_PATH) if node.endswith(".json") and not node.startswith(this_node)]
 
     @staticmethod
     def get_node_information(node_name):
