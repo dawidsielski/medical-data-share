@@ -299,7 +299,7 @@ def get_all_nodes_info():
     my_lab_address = config.get('NODE', 'NODE_ADDRESS')
     keys = KeyGeneration()
     keys.load_keys()
-    my_public_key = keys.public_key.exportKey()
+    my_public_key = keys.public_key.exportKey().decode()
     nodes_information.append({'address': my_lab_address, 'public-key': my_public_key, 'laboratory-name': my_lab_name})
     return nodes_information
 
