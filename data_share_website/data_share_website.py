@@ -292,7 +292,7 @@ def get_all_nodes_info():
     my_lab_address = config.get('NODE', 'NODE_ADDRESS')
     keys = KeyGeneration()
     keys.load_keys()
-    my_public_key = keys.public_key
+    my_public_key = keys.public_key.exportKey()
     nodes_information.update({my_lab_name: {'address': my_lab_address, 'public-key': my_public_key}})
     return nodes_information
 

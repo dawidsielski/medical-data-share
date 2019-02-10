@@ -62,7 +62,7 @@ class KeyGeneration(object):
         """
         path = os.path.join('keys')
         with open(os.path.join(path, '{}.key'.format('public')), 'rb') as file:
-            self.private_key = RSA.importKey(file.read())
+            self.public_key = RSA.importKey(file.read())
 
     def load_or_generate(self):
         """
