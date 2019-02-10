@@ -129,6 +129,7 @@ def add_node(endpoint, public_key_path, node_address, lab_name):
             print('Adding node for {} at {} with {} status_code'.format(key, value['address'], r.status_code))
             print(r.text)
         except Exception as e:
+            print(e)
             print('Error in adding node to {} at {} '.format(key, value['address']))
 
 
@@ -152,6 +153,8 @@ if __name__ == '__main__':
     parser.add_argument('-v', '--verbose', action='store_true', default=True)
     parser.add_argument('-r', '--raw', action='store_true', help='Will print raw response.')
 
+    parser.add_argument('-n', '--nodes', action='store_true', help="Will download available nodes.")
+
     args = parser.parse_args()
     print(args)
 
@@ -173,3 +176,12 @@ if __name__ == '__main__':
 
     elif args.generate:
         handle_keys_generation()
+
+    elif args.nodes:
+        available_laboratories = requests.post(args.endpoint).json()
+
+        for lab in available_laboratories:
+            name = lab['laboratory-name']
+
+            with open('{}.json'.format(name), 'w') as file:
+                json.dump(lab, file)

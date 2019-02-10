@@ -120,9 +120,16 @@ def add_node():
     """
     if request.method == 'POST':
         data = request.get_json()
-        if not DataShare.validate_signature_using_user_id(data):
-            logger.info('Invalid signature add-node')
-            abort(403, 'Invalid signature.')
+        try:
+            if not DataShare.validate_signature_using_user_id(data):
+                data_sharing_logger.info("Invalid signature. User id:{}".format(data['user_id']))
+                abort(403, "Invalid signature.")
+        except KeyError:
+            data_sharing_logger.info("Signature not provided.")
+            abort(406, "Invalid data supplied. User id:{}".format(data['user_id']))
+        except FileNotFoundError:
+            data_sharing_logger.info("No public key supports this request.")
+            abort(400)
 
         data_sharing_logger.info('Add node: {}'.format(data))
 
@@ -279,29 +286,34 @@ def variants_private():
 def get_all_nodes_info():
     nodes_path = os.path.join('nodes')
     nodes = os.listdir(nodes_path)
-    my_keys = ['address', 'public-key']
+    my_keys = ['address', 'public-key', 'laboratory-name']
 
-    nodes_information = {}
+    nodes_information = []
     for node_path in [os.path.join(nodes_path, node) for node in nodes]:
         with open(node_path, 'r') as file:
             node_info = json.load(file)
 
-        nodes_information.update({node_info['laboratory-name']: {key: node_info[key] for key in my_keys}})
+        nodes_information.append({key: node_info[key] for key in my_keys})
 
     my_lab_name = config.get('NODE', 'LABORATORY_NAME')
     my_lab_address = config.get('NODE', 'NODE_ADDRESS')
     keys = KeyGeneration()
     keys.load_keys()
     my_public_key = keys.public_key.exportKey()
-    nodes_information.update({my_lab_name: {'address': my_lab_address, 'public-key': my_public_key}})
+    nodes_information.append({'address': my_lab_address, 'public-key': my_public_key, 'laboratory-name': my_lab_name})
     return nodes_information
 
 
 @server.route('/nodes', methods=['GET', 'POST'])
 def available_nodes():
     available_nodes_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'nodes_available', 'nodes_available.json')
-    with open(available_nodes_path, 'r') as json_file:
-        nodes = json.load(json_file)
+
+    try:
+        with open(available_nodes_path, 'r') as json_file:
+            nodes = json.load(json_file)
+    except FileNotFoundError:
+        logger.exception('Nodes available not found.')
+        nodes = {}
 
     if request.method == 'POST':
         return jsonify(get_all_nodes_info())
