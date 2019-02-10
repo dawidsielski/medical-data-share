@@ -14,6 +14,7 @@ from variant_db.TabixedTableVarinatDB import TabixedTableVarinatDB
 from utils.public_variants_handler.PublicVariantsHandler import PublicVariantsHandler
 from utils.request_id_generator.RequestIdGenerator import RequestIdGenerator
 from utils.encryption_key_generator.EncryptionKeyGenerator import EncryptionKeyGenerator
+from utils.user_validation.UserValidation import UserValidation
 
 config = ConfigParser()
 config.read(os.path.join(os.getcwd(), 'config.ini'), encoding='utf-8')
@@ -322,3 +323,16 @@ def available_nodes():
         'lab_name': config.get('NODE', 'LABORATORY_NAME')
     }
     return render_template('nodes.html', nodes=nodes, **data)
+
+
+@server.route('/check-user', methods=['GET', 'POST'])
+def check_user():
+    if request.method == 'POST':
+        data = request.json
+
+        result = {
+            'result': UserValidation.check_local_users(data['user_id'], data['node'])
+        }
+        return jsonify(result)
+
+    abort(400)
