@@ -60,6 +60,6 @@ class UserValidation(object):
     def validate_user(user_id):
         user_id, node = user_id.split('@')
         if node == config.get('NODE', 'LABORATORY_NAME'):
-            UserValidation.check_local_users(user_id)
+            return UserValidation.check_local_users(user_id)
         else:
-            UserValidation.check_remote_node(user_id, node)
+            return UserValidation.check_remote_node(user_id, node)
