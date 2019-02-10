@@ -122,15 +122,15 @@ def add_node(endpoint, public_key_path, node_address, lab_name):
 
     print('Adding {} laboratory at {} to every node.'.format(lab_name, node_address))
     r = requests.post(endpoint, json=data)
-    for key, value in all_nodes.items():
-        add_node_specific_endpoint = add_node_endpoint(value['address'])
+    for node in all_nodes:
+        add_node_specific_endpoint = add_node_endpoint(node['address'])
         try:
             r = requests.post(add_node_specific_endpoint, json=data)
-            print('Adding node for {} at {} with {} status_code'.format(key, value['address'], r.status_code))
+            print('Adding node for {} at {} with {} status_code'.format(node['laboratory-name'], node['address'], r.status_code))
             print(r.text)
         except Exception as e:
             print(e)
-            print('Error in adding node to {} at {} '.format(key, value['address']))
+            print('Error in adding node to {} at {} '.format(node['laboratory-name'], node['address']))
 
 
 if __name__ == '__main__':
