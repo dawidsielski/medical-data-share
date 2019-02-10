@@ -123,6 +123,10 @@ def add_node(endpoint, public_key_path, node_address, lab_name):
     print('Adding {} laboratory at {} to every node.'.format(lab_name, node_address))
     r = requests.post(endpoint, json=data)
     for node in all_nodes:
+
+        if node['laboratory-name'] == data['laboratory-name']:
+            continue
+
         add_node_specific_endpoint = add_node_endpoint(node['address'])
         try:
             r = requests.post(add_node_specific_endpoint, json=data)
