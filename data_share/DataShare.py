@@ -55,7 +55,6 @@ class DataShare(object):
         :param signature:
         :return:
         """
-        print(type(public_key))
         if signature is None:
             signature = message.pop('signature')
 
@@ -141,8 +140,7 @@ class DataShare(object):
 
     @staticmethod
     def validate_signature(message):
-        user_validation = UserValidation.validate_user(message['user_id'])
-        print(user_validation)
+        user_validation = UserValidation.validate_user(message['user_id'])['result']
         if user_validation:
             return DataShare.validate_signature_from_message(message, public_key=user_validation), user_validation
         return False, None
