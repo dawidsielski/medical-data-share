@@ -23,7 +23,7 @@ class UserValidation(object):
             with open(os.path.join('public_keys', 'public.{}@{}.key'.format(user_id, node)), 'r') as file:
                 public_key = file.read()
         except FileNotFoundError:
-            public_key = None
+            public_key = False
 
         return public_key
 
