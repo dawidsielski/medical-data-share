@@ -215,7 +215,7 @@ def variants_private():
     """
     This is a private variant download api that will return variants depending on a given query.
 
-    As a GET request is presents a website how to use this endpoing.
+    As a GET request is presents a website how to use this endpoint.
 
     As a POST request is returns information about variants asked in the POST request data.
     POST arguments:

@@ -14,6 +14,10 @@ class NodesChecker(object):
 
     @staticmethod
     def get_all_nodes():
+        """
+        This function will get all nodes minus host node.
+        :return: (list)
+        """
         this_node = config.get('NODE', 'LABORATORY_NAME')
         return [node for node in os.listdir(NODES_PATH) if node.endswith(".json") and not node.startswith(this_node)]
 
@@ -47,7 +51,11 @@ class NodesChecker(object):
             return False
 
     @staticmethod
-    def get_all_nodes_availability(save=True):
+    def get_all_nodes_availability():
+        """
+        This function will check availability of all nodes and save this information to a file.
+        :return: (dict) nodes availability information
+        """
         all_nodes = NodesChecker.get_all_nodes()
 
         node_availability = {}
@@ -59,7 +67,7 @@ class NodesChecker(object):
             }
             node_availability[node['laboratory-name']] = data
 
-        if save:
-            with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'nodes_available.json'), 'w') as json_file:
-                json.dump(node_availability, json_file)
+        with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'nodes_available.json'), 'w') as json_file:
+            json.dump(node_availability, json_file)
+
         return node_availability

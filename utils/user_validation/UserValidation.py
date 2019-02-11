@@ -55,11 +55,10 @@ class UserValidation(object):
 
         return check_user_response['result']
 
-
     @staticmethod
     def validate_user(user_id):
         user_id, node = user_id.split('@')
         if node == config.get('NODE', 'LABORATORY_NAME'):
-            return UserValidation.check_local_users(user_id)
+            return UserValidation.check_local_users(user_id, node)
         else:
             return UserValidation.check_remote_node(user_id, node)
