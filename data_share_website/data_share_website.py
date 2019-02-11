@@ -288,13 +288,17 @@ def variants_private():
 
 def get_all_nodes_info():
     nodes_path = os.path.join('nodes')
-    nodes = os.listdir(nodes_path)
+    nodes = [node for node in os.listdir(nodes_path) if node.endswith('.json')]
     my_keys = ['address', 'public-key', 'laboratory-name']
 
     nodes_information = []
     for node_path in [os.path.join(nodes_path, node) for node in nodes]:
-        with open(node_path, 'r') as file:
-            node_info = json.load(file)
+        try:
+            with open(node_path, 'r') as file:
+                node_info = json.load(file)
+        except json.decoder.JSONDecodeError as e:
+            logger.exception(e)
+            continue
 
         nodes_information.append({key: node_info[key] for key in my_keys})
 
