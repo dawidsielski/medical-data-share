@@ -345,6 +345,7 @@ def check_user():
     """
     if request.method == 'POST':
         data = request.json
+        print(data)
 
         result = {
             'result': UserValidation.check_local_users(data['user_id'], data['node']),
