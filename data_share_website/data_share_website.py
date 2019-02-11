@@ -256,6 +256,9 @@ def variants_private():
             else:
                 chromosome_results = []
 
+            chromosome_results = list(chromosome_results)
+            print(chromosome_results)
+
         except KeyError as e:
             data_sharing_logger.exception(e)
             return abort(406)
