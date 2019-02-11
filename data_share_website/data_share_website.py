@@ -231,7 +231,8 @@ def variants_private():
     if request.method == 'POST':
         params = request.get_json()
         try:
-            if not DataShare.validate_signature(params):
+            valid_signature, public_key = DataShare.validate_signature(params)
+            if not valid_signature:
                 data_sharing_logger.info("Invalid signature. User id:{}".format(params['user_id']))
                 abort(403, "Invalid signature.")
         except KeyError:
@@ -269,7 +270,7 @@ def variants_private():
             response = {
                 'request_id': RequestIdGenerator.generate_random_id(),
                 'lab_name': config.get('NODE', 'LABORATORY_NAME'),
-                'encryption_key': DataShare.encrypt_using_public_key(_new_encryption_key, params['user_id']),
+                'encryption_key': DataShare.encrypt_using_public_key(_new_encryption_key, params['user_id'], public_key),
                 'result': DataShare.encrypt_data(json.dumps(list(chromosome_results)), _new_encryption_key)
             }
             data_sharing_logger.info('{} - {}'.format(response['request_id'], params))

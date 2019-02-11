@@ -67,7 +67,7 @@ class DataShare(object):
             with open(public_key_path, 'rb') as file:
                 public_key = RSA.importKey(file.read())
         else:
-            public_key = RSA.importKey(public_key['result'])
+            public_key = RSA.importKey(public_key)
 
         h = SHA.new(message.encode()).digest()
 
@@ -116,10 +116,13 @@ class DataShare(object):
         return base64.b64encode(bytes(str(signature[0]).encode()))
 
     @staticmethod
-    def encrypt_using_public_key(message, user_id):
-        public_key_path = os.path.join('public_keys', f'public.{user_id}.key')
-        with open(public_key_path, 'rb') as file:
-            public_key = RSA.importKey(file.read())
+    def encrypt_using_public_key(message, user_id, public_key=None):
+        if public_key == None:
+            public_key_path = os.path.join('public_keys', f'public.{user_id}.key')
+            with open(public_key_path, 'rb') as file:
+                public_key = RSA.importKey(file.read())
+        else:
+            public_key = RSA.importKey(public_key)
 
         cipher = PKCS1_OAEP.new(public_key)
         encrypted = cipher.encrypt(message.encode())
@@ -139,7 +142,7 @@ class DataShare(object):
     def validate_signature(message):
         user_validation = UserValidation.validate_user(message['user_id'])
         if user_validation:
-            return DataShare.validate_signature_from_message(message, public_key=user_validation)
-        return False
+            return DataShare.validate_signature_from_message(message, public_key=user_validation), user_validation
+        return False, None
 
 
