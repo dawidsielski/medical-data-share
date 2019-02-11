@@ -74,4 +74,4 @@ class UserValidation(object):
         if node == config.get('NODE', 'LABORATORY_NAME'):
             return UserValidation.check_local_users(user_id, node)
         else:
-            return UserValidation.check_remote_node(user_id, node)
+            return UserValidation.check_remote_node(user_id, node)['result']

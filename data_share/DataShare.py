@@ -129,7 +129,7 @@ class DataShare(object):
         :param message: (str) message to be encrypted
         :param user_id: (str) user identification string
         :param public_key: (str)
-        :return: (str) encrypted intormation
+        :return: (str) encrypted information
         """
         if public_key is None:
             public_key_path = os.path.join('public_keys', f'public.{user_id}.key')
@@ -166,7 +166,7 @@ class DataShare(object):
         """
         user_validation = UserValidation.validate_user(message['user_id'])
         if user_validation:
-            return DataShare.validate_signature_from_message(message, public_key=user_validation['result']), user_validation['result']
+            return DataShare.validate_signature_from_message(message, public_key=user_validation), user_validation
         return False, None
 
 
