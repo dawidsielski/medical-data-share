@@ -137,6 +137,9 @@ def add_node():
         with open(os.path.join('nodes', '{}.json'.format(data['laboratory-name'])), 'w') as file:
             json.dump(data, file)
 
+        with open(os.path.join('nodes', 'public.{}.key'.format(data['laboratory-name'])), 'w') as file:
+            file.writelines(data['public-key'])
+
         return 'Success', 200
     abort(403)
 
@@ -190,7 +193,6 @@ def variants_public():
         try:
             chromosome_results = TabixedTableVarinatDB.get_variants(chrom, start, start)
             response = {
-
                 'request_id': RequestIdGenerator.generate_random_id(),
                 'lab_name': config.get('NODE', 'LABORATORY_NAME'),
                 'result': list(chromosome_results)
@@ -350,9 +352,18 @@ def check_user():
         data = request.json
         print(data)
 
+        with open(os.path.join('nodes', 'public.{}.key'.format(data['request_node'])), 'r') as file:
+            public_key = file.readlines()
+
+        if not DataShare.validate_signature_from_message(data, public_key=public_key):
+            abort(400)
+
         result = {
             'result': UserValidation.check_local_users(data['user_id'], data['node']),
         }
+        result = dict(sorted(result.items()))
+        result.update({'signature': DataShare.get_signature_for_message(result).decode()})
+
         print(result)
         return jsonify(result)
 

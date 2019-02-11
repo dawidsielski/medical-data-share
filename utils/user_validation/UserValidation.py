@@ -5,6 +5,8 @@ import requests
 from urllib.parse import urljoin
 from configparser import ConfigParser
 
+import data_share
+
 config = ConfigParser()
 config.read(os.path.join(os.getcwd(), 'config.ini'), encoding='utf-8')
 
@@ -56,11 +58,24 @@ class UserValidation(object):
 
         post_json = {
             'user_id': user_id,
-            'node': node
+            'node': node,
+            'request_node': config.get('NODE', 'LABORATORY_NAME'),
         }
+        post_json = dict(sorted(post_json.items()))
+        post_json.update({'signature': data_share.DataShare.get_signature_for_message(post_json).decode()})
+
+        print(post_json)
 
         check_user_request = requests.post(urljoin(node_address, 'check-user'), json=post_json)
         check_user_response = check_user_request.json()
+        print(check_user_response)
+
+        with open(os.path.join('nodes', 'public.{}.key'.format(node)), 'r') as file:
+            public_key = file.readlines()
+
+        if not data_share.DataShare.validate_signature_from_message(check_user_response, public_key=public_key):
+            return False
+
         return check_user_response
 
     @staticmethod
