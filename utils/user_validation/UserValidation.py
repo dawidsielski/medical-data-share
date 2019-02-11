@@ -66,6 +66,7 @@ class UserValidation(object):
 
         check_user_request = requests.post(urljoin(node_address, 'check-user'), json=post_json)
         check_user_response = check_user_request.json()
+        print("Check remote node json: {}".format(check_user_response))
 
         with open(os.path.join('nodes', 'public.{}.key'.format(node)), 'r') as file:
             public_key = file.read()

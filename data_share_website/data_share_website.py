@@ -349,6 +349,7 @@ def check_user():
     """
     if request.method == 'POST':
         data = request.json
+        print("Check user data json: {}".format(data))
 
         with open(os.path.join('nodes', 'public.{}.key'.format(data['request_node'])), 'r') as file:
             public_key = file.read()
@@ -361,6 +362,7 @@ def check_user():
         }
         result = dict(sorted(result.items()))
         result.update({'signature': DataShare.get_signature_for_message(result).decode()})
+        print("Check user data response: {}".format(result))
 
         return jsonify(result)
 
