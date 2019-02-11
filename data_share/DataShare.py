@@ -131,7 +131,7 @@ class DataShare(object):
         :param public_key: (str)
         :return: (str) encrypted intormation
         """
-        if public_key:
+        if public_key is None:
             public_key_path = os.path.join('public_keys', f'public.{user_id}.key')
             with open(public_key_path, 'rb') as file:
                 public_key = RSA.importKey(file.read())

@@ -172,8 +172,11 @@ if __name__ == '__main__':
             handle_request(r, args)
     elif args.endpoint.endswith('variants-private'):
         r = data_request(args.endpoint, args.chrom, args.start, args.stop)
-        message = json.loads(r.text)
-        handle_request(r, args)
+        if r.status_code == 200:
+            message = json.loads(r.text)
+            handle_request(r, args)
+        else:
+            print(r.text)
 
     elif args.add_node:
         add_node(args.endpoint, args.key, args.lab_address, args.lab_name)
