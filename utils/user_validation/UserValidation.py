@@ -71,7 +71,7 @@ class UserValidation(object):
         print(check_user_response)
 
         with open(os.path.join('nodes', 'public.{}.key'.format(node)), 'r') as file:
-            public_key = file.readlines()
+            public_key = file.read()
 
         if not data_share.DataShare.validate_signature_from_message(check_user_response, public_key=public_key):
             return False

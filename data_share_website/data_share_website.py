@@ -353,7 +353,7 @@ def check_user():
         print(data)
 
         with open(os.path.join('nodes', 'public.{}.key'.format(data['request_node'])), 'r') as file:
-            public_key = file.readlines()
+            public_key = file.read()
 
         if not DataShare.validate_signature_from_message(data, public_key=public_key):
             abort(400)
