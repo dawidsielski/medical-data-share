@@ -140,9 +140,9 @@ class DataShare(object):
 
     @staticmethod
     def validate_signature(message):
-        user_validation = UserValidation.validate_user(message['user_id'])['result']
+        user_validation = UserValidation.validate_user(message['user_id'])
         if user_validation:
-            return DataShare.validate_signature_from_message(message, public_key=user_validation), user_validation
+            return DataShare.validate_signature_from_message(message, public_key=user_validation['result']), user_validation['result']
         return False, None
 
 
