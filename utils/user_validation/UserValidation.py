@@ -14,14 +14,18 @@ class UserValidation(object):
     @staticmethod
     def check_local_users(user_id, node):
         """
-        THis function valides local user.
+        This function validates local user.
         :param user_id: (str) 32 character random user identification string
         :param node: (str) node to which the user belongs to
-        :return: (bool) True is user_id is valid for this node, False if user is not valid for this node
+        :return: public_key (str) if user exists, None there is no such user
         """
-        users_path = os.path.join('public_keys')
-        user_id_path = os.path.join(users_path, 'public.{}@{}.key'.format(user_id, node))
-        return os.path.isfile(user_id_path)
+        try:
+            with open(os.path.join('public_keys', 'public.{}@{}.key'.format(user_id, node)), 'r') as file:
+                public_key = file.read()
+        except FileNotFoundError:
+            public_key = None
+
+        return public_key
 
     @staticmethod
     def get_node_address(node):
@@ -51,7 +55,7 @@ class UserValidation(object):
 
         check_user_request = requests.post(urljoin(node_address, 'check-user'), json=post_json)
         check_user_response = check_user_request.json()
-        return check_user_response['result']
+        return check_user_response
 
     @staticmethod
     def validate_user(user_id):

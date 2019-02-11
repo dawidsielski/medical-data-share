@@ -330,12 +330,8 @@ def check_user():
     if request.method == 'POST':
         data = request.json
 
-        with open(os.path.join('public_keys', 'public.{}@{}.key'.format(data['user_id'], data['node'])), 'r') as file:
-            public_key = file.read()
-
         result = {
             'result': UserValidation.check_local_users(data['user_id'], data['node']),
-            'public-key': public_key,
         }
         return jsonify(result)
 
