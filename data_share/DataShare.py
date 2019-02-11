@@ -65,9 +65,10 @@ class DataShare(object):
         if public_key is None:
             public_key_path = os.path.join('keys', 'public.key')
             with open(public_key_path, 'rb') as file:
+                print(type(file.read()))
                 public_key = RSA.importKey(file.read())
         else:
-            public_key = RSA.importKey(public_key)
+            public_key = RSA.importKey(public_key.encode())
 
         h = SHA.new(message.encode()).digest()
 
