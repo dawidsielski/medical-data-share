@@ -350,6 +350,7 @@ def check_user():
         result = {
             'result': UserValidation.check_local_users(data['user_id'], data['node']),
         }
+        print(result)
         return jsonify(result)
 
     abort(400)
