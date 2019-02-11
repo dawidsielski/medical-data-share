@@ -25,9 +25,9 @@ class DataShare(object):
         """
         The function takes data argument and decrypts it using ENCRYPTION_KEY. It also unpads the data to be prepared
         for saving
-        :param data: (str)
-        :param encryption_key: (str)
-        :return: (str)
+        :param data: (str) data to be decrypted
+        :param encryption_key: (str) 32 character random encryption key
+        :return: (str) decrypted information
         """
         assert isinstance(data, str)
         obj = AES.new(encryption_key, AES.MODE_CBC, 'This is an IV456')
@@ -39,6 +39,7 @@ class DataShare(object):
         """
         This function encrypts data and prepares it for sending.
         :param data: (str) holds unprocessed data to be send
+        :param encryption_key: (str) 32 character random encryption key
         :return: (str) data ready to be send
         """
         assert isinstance(data, str)
@@ -51,9 +52,14 @@ class DataShare(object):
     def validate_signature_from_message(message, signature=None, public_key=None):
         """
         This function checks if incoming message is valid for this machine.
+
+        By default this function will use signature privided in a message argument.
+        If not you can specify your own sugnature by passing signature argument.
+
         :param message: (obj) json incoming message
-        :param signature:
-        :return:
+        :param signature: (str) signature for the message (None by default)
+        :param public_key: (str) holds public key string information (None by default)
+        :return: (bool) True if message is signed correctly, False otherwise
         """
         if signature is None:
             signature = message.pop('signature')
@@ -117,7 +123,15 @@ class DataShare(object):
 
     @staticmethod
     def encrypt_using_public_key(message, user_id, public_key=None):
-        if public_key == None:
+        """
+        This function perform encryption with given public key.
+        If public key not supplied the one provided for the user_id will be used.
+        :param message: (str) message to be encrypted
+        :param user_id: (str) user identification string
+        :param public_key: (str)
+        :return: (str) encrypted intormation
+        """
+        if public_key:
             public_key_path = os.path.join('public_keys', f'public.{user_id}.key')
             with open(public_key_path, 'rb') as file:
                 public_key = RSA.importKey(file.read())
@@ -130,6 +144,11 @@ class DataShare(object):
 
     @staticmethod
     def decrypt_using_private_key(message):
+        """
+        This function decrypts information using default private key for the machine.
+        :param message: (str) message to be decrypted
+        :return: (str) unencrypted message
+        """
         public_key_path = os.path.join('keys', 'private.key')
         with open(public_key_path, 'rb') as file:
             private_key = RSA.importKey(file.read())
@@ -140,6 +159,11 @@ class DataShare(object):
 
     @staticmethod
     def validate_signature(message):
+        """
+        This function takes message as an agrument and checks if user is authorized for performing such operation.
+        :param message: (dict) holds whole request json information
+        :return: (tuple) True, <public_key> if user is authorized and False, None if not
+        """
         user_validation = UserValidation.validate_user(message['user_id'])
         if user_validation:
             return DataShare.validate_signature_from_message(message, public_key=user_validation['result']), user_validation['result']

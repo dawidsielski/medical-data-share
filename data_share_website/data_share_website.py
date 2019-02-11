@@ -309,6 +309,11 @@ def get_all_nodes_info():
 
 @server.route('/nodes', methods=['GET', 'POST'])
 def available_nodes():
+    """
+    As a get request this function renders /nodes webpage on which nodes that are available are presented.
+
+    As a post request this function will return information about all available nodes.
+    """
     available_nodes_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'nodes_available', 'nodes_available.json')
 
     try:
@@ -329,6 +334,11 @@ def available_nodes():
 
 @server.route('/check-user', methods=['GET', 'POST'])
 def check_user():
+    """
+    As a get request this function will give 400 bad request status code.
+
+    As a post request this function will check if given user is authorized to get the data from server.
+    """
     if request.method == 'POST':
         data = request.json
 

@@ -43,6 +43,12 @@ class UserValidation(object):
 
     @staticmethod
     def check_remote_node(user_id, node):
+        """
+        This functin checks if user named <user_id> exists in remote node.
+        :param user_id: (str) user identification string
+        :param node: (str) the name of the node
+        :return: (dict) user authorization information
+        """
         node_address = UserValidation.get_node_address(node)
 
         if not node_address:
@@ -59,6 +65,11 @@ class UserValidation(object):
 
     @staticmethod
     def validate_user(user_id):
+        """
+        This function checks if user_id is authorized to access the data.
+        :param user_id: (str) user identification string
+        :return: dict if user is authorized and False if not
+        """
         user_id, node = user_id.split('@')
         if node == config.get('NODE', 'LABORATORY_NAME'):
             return UserValidation.check_local_users(user_id, node)
