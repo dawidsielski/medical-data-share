@@ -64,11 +64,8 @@ class UserValidation(object):
         post_json = dict(sorted(post_json.items()))
         post_json.update({'signature': data_share.DataShare.get_signature_for_message(post_json).decode()})
 
-        print(post_json)
-
         check_user_request = requests.post(urljoin(node_address, 'check-user'), json=post_json)
         check_user_response = check_user_request.json()
-        print(check_user_response)
 
         with open(os.path.join('nodes', 'public.{}.key'.format(node)), 'r') as file:
             public_key = file.read()
@@ -76,6 +73,7 @@ class UserValidation(object):
         if not data_share.DataShare.validate_signature_from_message(check_user_response, public_key=public_key):
             return False
 
+        print(check_user_response)
         return check_user_response
 
     @staticmethod

@@ -244,7 +244,6 @@ def variants_private():
             data_sharing_logger.info("No public key supports this request.")
             abort(400)
 
-
         try:
             param_keys = params.keys()
             genome_build = 'hg19'  # this will be hg19 or hg38
@@ -350,7 +349,6 @@ def check_user():
     """
     if request.method == 'POST':
         data = request.json
-        print(data)
 
         with open(os.path.join('nodes', 'public.{}.key'.format(data['request_node'])), 'r') as file:
             public_key = file.read()
@@ -364,7 +362,6 @@ def check_user():
         result = dict(sorted(result.items()))
         result.update({'signature': DataShare.get_signature_for_message(result).decode()})
 
-        print(result)
         return jsonify(result)
 
     abort(400)
