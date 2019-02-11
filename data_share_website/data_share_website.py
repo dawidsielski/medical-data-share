@@ -95,7 +95,7 @@ def receive_data():
     if request.method == 'POST':
         data = json.loads(request.get_json())
         print('Data recivied: ' + json.dumps(data))
-        if not DataShare.validate_signature(data):
+        if not DataShare.validate_signature_from_message(data):
             logger.info("Invalid signature.")
             abort(403, "Invalid signature.")
 
@@ -330,8 +330,12 @@ def check_user():
     if request.method == 'POST':
         data = request.json
 
+        with open(os.path.join('public_keys', 'public.{}@{}.key'.format(data['user_id'], data['node'])), 'r') as file:
+            public_key = file.read()
+
         result = {
-            'result': UserValidation.check_local_users(data['user_id'], data['node'])
+            'result': UserValidation.check_local_users(data['user_id'], data['node']),
+            'public-key': public_key,
         }
         return jsonify(result)
 

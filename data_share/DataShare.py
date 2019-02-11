@@ -4,7 +4,7 @@ import base64
 
 from Crypto.Cipher import AES, PKCS1_OAEP
 from data_share.Pad import Pad
-from utils.encryption_key_generator.EncryptionKeyGenerator import EncryptionKeyGenerator
+from utils.user_validation.UserValidation import UserValidation
 
 from Crypto.Hash import SHA256
 from Crypto.PublicKey import RSA
@@ -48,7 +48,7 @@ class DataShare(object):
         return ciphertext.hex()
 
     @staticmethod
-    def validate_signature(message, signature=None):
+    def validate_signature_from_message(message, signature=None):
         """
         This function checks if incoming message is valid for this machine.
         :param message: (obj) json incoming message
@@ -135,3 +135,7 @@ class DataShare(object):
     @staticmethod
     def prepare_data_for_sending(data):
         return json.dumps(data)
+
+    @staticmethod
+    def validate_signature(user_id, message, signature):
+        pass

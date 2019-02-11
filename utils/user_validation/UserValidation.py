@@ -50,9 +50,7 @@ class UserValidation(object):
         }
 
         check_user_request = requests.post(urljoin(node_address, 'check-user'), json=post_json)
-
         check_user_response = check_user_request.json()
-
         return check_user_response['result']
 
     @staticmethod
