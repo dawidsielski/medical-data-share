@@ -231,7 +231,7 @@ def variants_private():
     if request.method == 'POST':
         params = request.get_json()
         try:
-            if not DataShare.validate_signature_using_user_id(params):
+            if not DataShare.validate_signature(params):
                 data_sharing_logger.info("Invalid signature. User id:{}".format(params['user_id']))
                 abort(403, "Invalid signature.")
         except KeyError:
@@ -240,6 +240,7 @@ def variants_private():
         except FileNotFoundError:
             data_sharing_logger.info("No public key supports this request.")
             abort(400)
+
 
         try:
             param_keys = params.keys()

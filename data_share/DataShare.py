@@ -48,7 +48,7 @@ class DataShare(object):
         return ciphertext.hex()
 
     @staticmethod
-    def validate_signature_from_message(message, signature=None):
+    def validate_signature_from_message(message, signature=None, public_key=None):
         """
         This function checks if incoming message is valid for this machine.
         :param message: (obj) json incoming message
@@ -62,9 +62,12 @@ class DataShare(object):
 
         message = json.dumps(message)
 
-        public_key_path = os.path.join('keys', 'public.key')
-        with open(public_key_path, 'rb') as file:
-            public_key = RSA.importKey(file.read())
+        if public_key is None:
+            public_key_path = os.path.join('keys', 'public.key')
+            with open(public_key_path, 'rb') as file:
+                public_key = RSA.importKey(file.read())
+        else:
+            public_key = RSA.importKey(public_key)
 
         h = SHA.new(message.encode()).digest()
 
@@ -133,9 +136,10 @@ class DataShare(object):
         return encrypted.hex()
 
     @staticmethod
-    def prepare_data_for_sending(data):
-        return json.dumps(data)
+    def validate_signature(message):
+        user_validation = UserValidation.validate_user(message['user_id'])
+        if user_validation:
+            return DataShare.validate_signature_from_message(message, public_key=user_validation)
+        return False
 
-    @staticmethod
-    def validate_signature(user_id, message, signature):
-        pass
+
