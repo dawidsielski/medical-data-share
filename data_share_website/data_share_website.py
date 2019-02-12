@@ -2,16 +2,19 @@ import json
 import logging
 import os
 import datetime
-import base64
+import re
 
 from logging.handlers import TimedRotatingFileHandler
 from configparser import ConfigParser
 from flask import Flask, render_template, redirect, url_for, jsonify, request, abort
 
 from data_share.DataShare import DataShare
+from data_share.KeyGeneration import KeyGeneration
 from variant_db.TabixedTableVarinatDB import TabixedTableVarinatDB
 from utils.public_variants_handler.PublicVariantsHandler import PublicVariantsHandler
 from utils.request_id_generator.RequestIdGenerator import RequestIdGenerator
+from utils.encryption_key_generator.EncryptionKeyGenerator import EncryptionKeyGenerator
+from utils.user_validation.UserValidation import UserValidation
 
 config = ConfigParser()
 config.read(os.path.join(os.getcwd(), 'config.ini'), encoding='utf-8')
@@ -92,7 +95,7 @@ def receive_data():
     if request.method == 'POST':
         data = json.loads(request.get_json())
         print('Data recivied: ' + json.dumps(data))
-        if not DataShare.validate_signature(data):
+        if not DataShare.validate_signature_from_message(data):
             logger.info("Invalid signature.")
             abort(403, "Invalid signature.")
 
@@ -106,26 +109,6 @@ def receive_data():
     abort(403)
 
 
-@server.route('/sample-node', methods=['GET', 'POST'])
-def sample_node():
-    """
-    Sample node data
-    """
-    path = os.path.join('keys', 'public.key')
-    with open(path, 'rb') as file:
-        public_key = file.read()
-
-    response = {
-        'address': '0.0.0.0',
-        'name': 'Laboratory-Warsaw2',
-        'public_key': DataShare.encrypt_data(base64.b64encode(public_key).decode()),
-    }
-
-    response.update({'signature': DataShare.get_signature_for_message(response)})
-
-    return jsonify(response), 200
-
-
 @server.route('/add-node', methods=['GET', 'POST'])
 def add_node():
     """
@@ -137,16 +120,22 @@ def add_node():
     POST request must be signed. If it is not the node will not be added.
     """
     if request.method == 'POST':
-        data = json.loads(request.get_json())
-        if not DataShare.validate_signature(data):
-            logger.info('Invalid signature add-node')
-            abort(403, 'Invalid signature.')
+        data = request.get_json()
+        try:
+            if not DataShare.validate_signature_using_user_id(data):
+                data_sharing_logger.info("Invalid signature. User id:{}".format(data['user_id']))
+                abort(403, "Invalid signature.")
+        except KeyError:
+            data_sharing_logger.info("Signature not provided.")
+            abort(406, "Invalid data supplied. User id:{}".format(data['user_id']))
+        except FileNotFoundError:
+            data_sharing_logger.info("No public key supports this request.")
+            abort(400)
 
-        with open(os.path.join('nodes', '{}.json'.format(data['name'])), 'w') as file:
+        data_sharing_logger.info('Add node: {}'.format(data))
+
+        with open(os.path.join('nodes', '{}.json'.format(data['laboratory-name'])), 'w') as file:
             json.dump(data, file)
-
-        with open(os.path.join('nodes', '{}.key'.format(data['name'])), 'w') as file:
-            file.write(base64.b64decode(DataShare.decrypt_data(data['public_key'])).decode())
 
         return 'Success', 200
     abort(403)
@@ -177,19 +166,33 @@ def variants_public():
         try:
             params = request.get_json()
             genome_build = 'hg19'  # this will be hg19 or hg38
-            chrom = params['chrom']
-            start = params['start']
+
+            if 'query' in params:
+                pattern = re.compile(r'(?P<CHROM>(\d+))[ :](?P<START>(\d+))([ :](?P<STOP>\d+))?')
+                s = re.search(pattern, params['query'])
+                chrom, start = int(s.group('CHROM')), int(s.group('START'))
+            else:
+                chrom = params['chrom']
+                start = params['start']
         except KeyError as e:
             logger.exception(e)
             return abort(406)
         except TypeError as e:
             logger.exception(e)
             return abort(406, 'Invalid type or data not supplied.')
+        except AttributeError as e:
+            logger.exception(e)
+            return abort(406, 'Invalid type or data not supplied.')
+        except Exception as e:
+            logger.exception(e)
+            return abort(500)
 
         try:
             chromosome_results = TabixedTableVarinatDB.get_variants(chrom, start, start)
             response = {
+
                 'request_id': RequestIdGenerator.generate_random_id(),
+                'lab_name': config.get('NODE', 'LABORATORY_NAME'),
                 'result': list(chromosome_results)
             }
             PublicVariantsHandler.decrease_number_of_requests_left()
@@ -212,7 +215,7 @@ def variants_private():
     """
     This is a private variant download api that will return variants depending on a given query.
 
-    As a GET request is presents a website how to use this endpoing.
+    As a GET request is presents a website how to use this endpoint.
 
     As a POST request is returns information about variants asked in the POST request data.
     POST arguments:
@@ -226,8 +229,21 @@ def variants_private():
     Having problems with running tabix will result in 500 internal error status code.
     """
     if request.method == 'POST':
+        params = request.get_json()
         try:
-            params = request.get_json()
+            valid_signature, public_key = DataShare.validate_signature(params)
+            if not valid_signature:
+                data_sharing_logger.info("Invalid signature. User id:{}".format(params['user_id']))
+                abort(403, "Invalid signature.")
+        except KeyError:
+            data_sharing_logger.info("Signature not provided.")
+            abort(406, "Invalid data supplied. User id:{}".format(params['user_id']))
+        except FileNotFoundError:
+            data_sharing_logger.info("No public key supports this request.")
+            abort(400)
+
+
+        try:
             param_keys = params.keys()
             genome_build = 'hg19'  # this will be hg19 or hg38
 
@@ -240,22 +256,30 @@ def variants_private():
             else:
                 chromosome_results = []
 
+            chromosome_results = list(chromosome_results)
+            print(chromosome_results)
+
         except KeyError as e:
-            logger.exception(e)
+            data_sharing_logger.exception(e)
             return abort(406)
         except TypeError as e:
-            logger.exception(e)
+            data_sharing_logger.exception(e)
             return abort(406, 'Invalid type or data not supplied.')
 
         try:
+            _new_encryption_key = EncryptionKeyGenerator().generate_encryption_key()
+            data_sharing_logger.debug('Encryption key: {}'.format(_new_encryption_key))
+
             response = {
                 'request_id': RequestIdGenerator.generate_random_id(),
-                'result': list(chromosome_results)
+                'lab_name': config.get('NODE', 'LABORATORY_NAME'),
+                'encryption_key': DataShare.encrypt_using_public_key(_new_encryption_key, params['user_id'], public_key),
+                'result': DataShare.encrypt_data(json.dumps(list(chromosome_results)), _new_encryption_key)
             }
             data_sharing_logger.info('{} - {}'.format(response['request_id'], params))
             return json.dumps(response), 200
         except Exception as e:
-            logger.exception(e)
+            data_sharing_logger.exception(e)
             return abort(500)
 
     data = {
@@ -265,13 +289,71 @@ def variants_private():
     return render_template('private_variants.html', **data)
 
 
+def get_all_nodes_info():
+    nodes_path = os.path.join('nodes')
+    nodes = [node for node in os.listdir(nodes_path) if node.endswith('.json')]
+    my_keys = ['address', 'public-key', 'laboratory-name']
+
+    nodes_information = []
+    for node_path in [os.path.join(nodes_path, node) for node in nodes]:
+        try:
+            with open(node_path, 'r') as file:
+                node_info = json.load(file)
+        except json.decoder.JSONDecodeError as e:
+            logger.exception(e)
+            continue
+
+        nodes_information.append({key: node_info[key] for key in my_keys})
+
+    my_lab_name = config.get('NODE', 'LABORATORY_NAME')
+    my_lab_address = config.get('NODE', 'NODE_ADDRESS')
+    keys = KeyGeneration()
+    keys.load_keys()
+    my_public_key = keys.public_key.exportKey().decode()
+    nodes_information.append({'address': my_lab_address, 'public-key': my_public_key, 'laboratory-name': my_lab_name})
+    return nodes_information
+
+
 @server.route('/nodes', methods=['GET', 'POST'])
 def available_nodes():
+    """
+    As a get request this function renders /nodes webpage on which nodes that are available are presented.
+
+    As a post request this function will return information about all available nodes.
+    """
     available_nodes_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'nodes_available', 'nodes_available.json')
-    with open(available_nodes_path, 'r') as json_file:
-        nodes = json.load(json_file)
+
+    try:
+        with open(available_nodes_path, 'r') as json_file:
+            nodes = json.load(json_file)
+    except FileNotFoundError:
+        logger.exception('Nodes available not found.')
+        nodes = {}
+
+    if request.method == 'POST':
+        return jsonify(get_all_nodes_info())
 
     data = {
         'lab_name': config.get('NODE', 'LABORATORY_NAME')
     }
     return render_template('nodes.html', nodes=nodes, **data)
+
+
+@server.route('/check-user', methods=['GET', 'POST'])
+def check_user():
+    """
+    As a get request this function will give 400 bad request status code.
+
+    As a post request this function will check if given user is authorized to get the data from server.
+    """
+    if request.method == 'POST':
+        data = request.json
+        print(data)
+
+        result = {
+            'result': UserValidation.check_local_users(data['user_id'], data['node']),
+        }
+        print(result)
+        return jsonify(result)
+
+    abort(400)

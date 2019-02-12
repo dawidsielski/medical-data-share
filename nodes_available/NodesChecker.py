@@ -2,14 +2,24 @@ import os
 import requests
 import json
 
+from configparser import ConfigParser
+
 NODES_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'nodes')
+
+config = ConfigParser()
+config.read(os.path.join(os.getcwd(), 'config.ini'), encoding='utf-8')
 
 
 class NodesChecker(object):
 
     @staticmethod
     def get_all_nodes():
-        return [node for node in os.listdir(NODES_PATH) if node.endswith(".json")]
+        """
+        This function will get all nodes minus host node.
+        :return: (list)
+        """
+        this_node = config.get('NODE', 'LABORATORY_NAME')
+        return [node for node in os.listdir(NODES_PATH) if node.endswith(".json") and not node.startswith(this_node)]
 
     @staticmethod
     def get_node_information(node_name):
@@ -41,7 +51,11 @@ class NodesChecker(object):
             return False
 
     @staticmethod
-    def get_all_nodes_availability(save=True):
+    def get_all_nodes_availability():
+        """
+        This function will check availability of all nodes and save this information to a file.
+        :return: (dict) nodes availability information
+        """
         all_nodes = NodesChecker.get_all_nodes()
 
         node_availability = {}
@@ -51,9 +65,9 @@ class NodesChecker(object):
                 'availability': NodesChecker.get_node_availability(node),
                 'address': node['address']
             }
-            node_availability[node['name']] = data
+            node_availability[node['laboratory-name']] = data
 
-        if save:
-            with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'nodes_available.json'), 'w') as json_file:
-                json.dump(node_availability, json_file)
+        with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'nodes_available.json'), 'w') as json_file:
+            json.dump(node_availability, json_file)
+
         return node_availability

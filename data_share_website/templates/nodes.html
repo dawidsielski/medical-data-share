@@ -1,16 +1,18 @@
 {% extends "index.html" %}
 {% block content %}
+<div>
     {% if nodes %}
         {% for key, value in nodes.items() %}
-            <p><b>{{ key }}</b>
+            <p><h3><b>{{ key }}</b>
             {% if value['availability'] %}
                 <span class="badge badge-success">Available</span>
             {% else %}
                 <span class="badge badge-secondary">Unavailable</span>
             {% endif %}
-            </p>
+            </h3></p>
         {% endfor %}
     {% else %}
     <h1>No nodes available</h1>
     {% endif %}
+</div>
 {% endblock %}

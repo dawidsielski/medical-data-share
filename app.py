@@ -6,12 +6,11 @@ from configparser import ConfigParser
 from data_share.KeyGeneration import KeyGeneration
 from nodes_available.NodesChecker import NodesChecker
 from utils.public_variants_handler.PublicVariantsHandler import PublicVariantsHandler
-from utils.encryption_key_generator.EncryptionKeyGenerator import EncryptionKeyGenerator
 
 config = ConfigParser()
 config.read(os.path.join(os.getcwd(), 'config.ini'), encoding='utf-8')
 
-FOLDERS = ['logs', 'data_acquisition', 'nodes', 'keys', 'logs/data_sharing', 'logs/website']
+FOLDERS = ['logs', 'data_acquisition', 'nodes', 'keys', 'logs/data_sharing', 'logs/website', 'public_keys']
 
 
 def check_folder(folder_name):
@@ -35,9 +34,6 @@ if __name__ == '__main__':
     keys.load_or_generate()
 
     PublicVariantsHandler.create_temp_file()
-
-    ekg = EncryptionKeyGenerator()
-    ekg.generate_and_save()
 
     from data_share_website.data_share_website import server
 
