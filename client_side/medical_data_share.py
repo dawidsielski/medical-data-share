@@ -4,6 +4,7 @@ import json
 import os
 import sys
 import re
+import datetime
 
 from pprint import pprint
 from urllib.parse import urlparse, urljoin
@@ -193,7 +194,7 @@ if __name__ == '__main__':
     elif args.endpoint.endswith('variants-private') and args.all_nodes:
         available_laboratories = requests.post(urljoin(args.endpoint, 'nodes')).json()
 
-        data = []
+        result, data = {}, []
         for lab in available_laboratories[::-1]:
             print('Getting information from \"{}\" laboratory.'.format(lab['laboratory-name']))
             endpoint = urljoin(lab['address'], 'variants-private')
@@ -211,7 +212,20 @@ if __name__ == '__main__':
 
             data.append(obtained_data)
 
-        print(data)
+        result = {
+            'chromosome': args.chrom,
+            'start': args.start,
+            'stop': args.stop,
+            'request_time': datetime.datetime.now().isoformat(),
+            'result': data
+        }
+
+        if args.verbose:
+            pprint(result)
+
+        if args.save:
+            with open('query_result.json', 'w') as file:
+                json.dump(result, file)
 
     elif args.endpoint.endswith('variants-private'):
         r = data_request(args.endpoint, args.chrom, args.start, args.stop)

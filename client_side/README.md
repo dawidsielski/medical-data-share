@@ -54,6 +54,7 @@ To successfully perform request you also have to specify:
 * `--end` ending position in chromosome
 * `-q` or `--guery` simple query option for public requests
 * `-r` or `--raw` will display raw response from the server
+* `-a` or `--all-nodes` this will ask all available nodes for data
 
 By default program will display decrypted result of the query.
 
