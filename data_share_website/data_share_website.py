@@ -64,24 +64,6 @@ def page_not_found(error):
     return render_template('page_not_found.html', **data), 404
 
 
-@server.route("/sample-data")
-def send_data():
-    """
-    Sample data to be send.
-    """
-    encrypted = DataShare.encrypt_data("The message sdfsdlksjflksjflsdkj.")
-    # response keys must be sorted
-    response = {
-        "data": encrypted,
-        "name": 'Laboratory-Warsaw',
-    }
-    print('Data send: ' + json.dumps(response))
-
-    response.update({'signature': DataShare.get_signature_for_message(response)})
-
-    return jsonify(response), 200
-
-
 @server.route("/data", methods=['GET', 'POST'])
 def receive_data():
     """
@@ -362,7 +344,6 @@ def check_user():
             'request_id': RequestIdGenerator.generate_request_id(),
             'result': UserValidation.check_local_users(data['user_id'], data['node']),
         }
-        result = dict(sorted(result.items()))
         result.update({'signature': DataShare.get_signature_for_message(result).decode()})
         data_sharing_logger.info("Remote user check. {}".format(result))
         return jsonify(result)

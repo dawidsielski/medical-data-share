@@ -31,7 +31,6 @@ def data_request_public(endpoint, chrom=None, start=None, end=None):
 def data_request(endpoint, chrom=None, start=None, end=None):
     data = prepare_public_request(chrom, start, end)
     data.update({'user_id': PublicKeyPreparation.get_user_id()})
-    data = dict(sorted(data.items()))
     data.update({'signature': DataShare.get_signature_for_message(data).decode()})
     return requests.post(endpoint, json=data)
 
