@@ -94,7 +94,7 @@ def receive_data():
     """
     if request.method == 'POST':
         data = json.loads(request.get_json())
-        print('Data recivied: ' + json.dumps(data))
+        print('Data received: ' + json.dumps(data))
         if not DataShare.validate_signature_from_message(data):
             logger.info("Invalid signature.")
             abort(403, "Invalid signature.")
@@ -115,7 +115,7 @@ def add_node():
     This is an endpoint which is responsible for adding other laboratory (node) to the federation.
 
     Performing GET request will result in 403 (unauthorized).
-    Performing POST request will resutl in adding the incoming node to this computer providing the correct data in request.
+    Performing POST request will result in adding the incoming node to this computer providing the correct data in request.
 
     POST request must be signed. If it is not the node will not be added.
     """

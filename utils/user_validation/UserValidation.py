@@ -77,7 +77,6 @@ class UserValidation(object):
         if not data_share.DataShare.validate_signature_from_message(check_user_response, public_key=public_key):
             return False
 
-        print(check_user_response)
         return check_user_response
 
     @staticmethod
