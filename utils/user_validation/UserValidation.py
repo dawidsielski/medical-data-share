@@ -47,7 +47,7 @@ class UserValidation(object):
     @staticmethod
     def check_remote_node(user_id, node):
         """
-        This functin checks if user named <user_id> exists in remote node.
+        This function checks if user named <user_id> exists in remote node.
         :param user_id: (str) user identification string
         :param node: (str) the name of the node
         :return: (dict) user authorization information
