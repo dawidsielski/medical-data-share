@@ -157,6 +157,47 @@ def get_nodes(args):
                 pprint(available_laboratories)
 
 
+def variants_from_all_nodes(args, private=False):
+    available_laboratories = requests.post(urljoin(args.endpoint, 'nodes')).json()
+
+    result, data = {}, []
+    for lab in available_laboratories[::-1]:
+        print('Getting information from \"{}\" laboratory.'.format(lab['laboratory-name']))
+
+        if private:
+            endpoint = urljoin(lab['address'], 'variants-private')
+        else:
+            endpoint = urljoin(lab['address'], 'variants')
+        r = data_request(endpoint, args.chrom, args.start, args.stop)
+
+        try:
+            obtained_data = r.json()
+        except Exception:
+            print('ERROR from \"{}\" laboratory.'.format(lab['laboratory-name']))
+            continue
+
+        if 'encryption_key' in obtained_data:
+            obtained_data['result'] = decrypt_result(obtained_data)
+            obtained_data.pop('encryption_key')
+
+        data.append(obtained_data)
+
+    result = {
+        'chromosome': args.chrom,
+        'start': args.start,
+        'stop': args.stop,
+        'request_time': datetime.datetime.now().isoformat(),
+        'result': data
+    }
+
+    if args.verbose:
+        pprint(result)
+
+    if args.save:
+        with open('query_result.json', 'w') as file:
+            json.dump(result, file)
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
@@ -169,20 +210,39 @@ if __name__ == '__main__':
     parser.add_argument('--stop', type=int, help='Ending position.')
 
     parser.add_argument('-a', '--all-nodes', action='store_true', help='This flag will aggregate data form all available nodes.')
-    parser.add_argument('-k', '--key', type=str)
-    parser.add_argument('-ln', '--lab-name', type=str)
-    parser.add_argument('-la', '--lab-address', type=str)
+    parser.add_argument('-k', '--key', type=str, help='Path to a public key file.')
+    parser.add_argument('-ln', '--lab-name', type=str, help='Full laboratory name (as in config file)')
+    parser.add_argument('-la', '--lab-address', type=str, help='This is a laboratory address (e.g. ')
 
     parser.add_argument('-s', '--save', action='store_true')
-    parser.add_argument('-v', '--verbose', action='store_true', default=True)
+    parser.add_argument('-v', '--verbose', action='store_true')
     parser.add_argument('-r', '--raw', action='store_true', help='Will print raw response.')
 
     parser.add_argument('-n', '--nodes', action='store_true', help="Will download available nodes.")
 
     args = parser.parse_args()
-    print(args)
+    # print(args)
 
-    if args.endpoint.endswith('variants'):
+    print("---------------------------------------------------")
+    print(r"""
+ __  __          _ _           _       _       _              _                    
+|  \/  | ___  __| (_) ___ __ _| |   __| | __ _| |_ __ _   ___| |__   __ _ _ __ ___ 
+| |\/| |/ _ \/ _` | |/ __/ _` | |  / _` |/ _` | __/ _` | / __| '_ \ / _` | '__/ _ \
+| |  | |  __/ (_| | | (_| (_| | | | (_| | (_| | || (_| | \__ \ | | | (_| | | |  __/
+|_|  |_|\___|\__,_|_|\___\__,_|_|  \__,_|\__,_|\__\__,_| |___/_| |_|\__,_|_|  \___|
+        """)
+    print("---------------------------------------------------")
+    if not args.verbose:
+        print('If you want to see the output please set -v option.')
+        print('If you want to see raw output please set -r option.')
+        print("---------------------------------------------------")
+        print("For more help please visit -> https://github.com/dawidsielski/medical-data-share/blob/master/client_side/README.md")
+        print("---------------------------------------------------")
+
+    if args.endpoint.endswith('variants') and args.all_nodes:
+        variants_from_all_nodes(args)
+
+    elif args.endpoint.endswith('variants'):
         if args.chrom and args.start:
             r = data_request_public(args.endpoint, args.chrom, args.start)
             handle_request(r, args)
@@ -192,40 +252,7 @@ if __name__ == '__main__':
             handle_request(r, args)
 
     elif args.endpoint.endswith('variants-private') and args.all_nodes:
-        available_laboratories = requests.post(urljoin(args.endpoint, 'nodes')).json()
-
-        result, data = {}, []
-        for lab in available_laboratories[::-1]:
-            print('Getting information from \"{}\" laboratory.'.format(lab['laboratory-name']))
-            endpoint = urljoin(lab['address'], 'variants-private')
-            r = data_request(endpoint, args.chrom, args.start, args.stop)
-
-            try:
-                obtained_data = r.json()
-            except Exception:
-                print('ERROR from \"{}\" laboratory.'.format(lab['laboratory-name']))
-                continue
-
-            if 'encryption_key' in obtained_data:
-                obtained_data['result'] = decrypt_result(obtained_data)
-                obtained_data.pop('encryption_key')
-
-            data.append(obtained_data)
-
-        result = {
-            'chromosome': args.chrom,
-            'start': args.start,
-            'stop': args.stop,
-            'request_time': datetime.datetime.now().isoformat(),
-            'result': data
-        }
-
-        if args.verbose:
-            pprint(result)
-
-        if args.save:
-            with open('query_result.json', 'w') as file:
-                json.dump(result, file)
+        variants_from_all_nodes(args, private=True)
 
     elif args.endpoint.endswith('variants-private'):
         r = data_request(args.endpoint, args.chrom, args.start, args.stop)

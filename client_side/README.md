@@ -92,3 +92,5 @@ For private request:
 ```
 python3 medical_data_share.py -e http://localhost:8080/variants-private -s --chr 21
 ```
+
+For both previous examples you can specify `-a` or `--all-nodes` option to aggregate variants information from all nodes.
