@@ -349,23 +349,24 @@ def check_user():
     """
     if request.method == 'POST':
         data = request.json
-        print("Check user data json: {}".format(data))
 
-        with open(os.path.join('nodes', 'public.{}.key'.format(data['request_node'])), 'r') as file:
-            public_key = file.read()
-
-        print(public_key)
+        try:
+            with open(os.path.join('nodes', 'public.{}.key'.format(data['request_node'])), 'r') as file:
+                public_key = file.read()
+        except FileNotFoundError as e:
+            data_sharing_logger.exception("Remote user check failed. Request: {}".format(data))
+            data_sharing_logger.exception(e)
+            abort(403)
 
         if not DataShare.validate_signature_from_message(data, public_key=public_key):
-            abort(400)
+            abort(403)
 
         result = {
             'result': UserValidation.check_local_users(data['user_id'], data['node']),
         }
         result = dict(sorted(result.items()))
         result.update({'signature': DataShare.get_signature_for_message(result).decode()})
-        print("Check user data response: {}".format(result))
-
+        data_sharing_logger.info("Remote user check. {}".format(result))
         return jsonify(result)
 
     abort(400)
