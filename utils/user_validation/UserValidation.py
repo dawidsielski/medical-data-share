@@ -78,7 +78,7 @@ class UserValidation(object):
         if not data_share.DataShare.validate_signature_from_message(check_user_response, public_key=public_key):
             return False
 
-        return check_user_response
+        return check_user_response['result']
 
     @staticmethod
     def validate_user(user_id):
@@ -91,4 +91,4 @@ class UserValidation(object):
         if node == config.get('NODE', 'LABORATORY_NAME'):
             return UserValidation.check_local_users(user_id, node)
         else:
-            return UserValidation.check_remote_node(user_id, node)['result']
+            return UserValidation.check_remote_node(user_id, node)
