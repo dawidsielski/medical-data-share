@@ -137,6 +137,25 @@ def add_node(endpoint, public_key_path, node_address, lab_name):
             print('Error in adding node to {} at {} '.format(node['laboratory-name'], node['address']))
 
 
+def get_nodes(args):
+    available_laboratories = requests.post(args.endpoint).json()
+
+    if args.save:
+        if not os.path.isdir('nodes'):
+            os.mkdir('nodes')
+        for lab in available_laboratories:
+            name = lab['laboratory-name']
+
+            with open(os.path.join('nodes', '{}.json'.format(name)), 'w') as file:
+                json.dump(lab, file)
+
+            with open(os.path.join('nodes', 'public.{}.key'.format(name)), 'w') as file:
+                file.writelines(lab['public-key'])
+
+            if args.verbose:
+                pprint(available_laboratories)
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
@@ -148,7 +167,7 @@ if __name__ == '__main__':
     parser.add_argument('--start', type=int, help='Starting position.')
     parser.add_argument('--stop', type=int, help='Ending position.')
 
-    parser.add_argument('-a', '--add-node', action='store_true')
+    parser.add_argument('-a', '--all-nodes', action='store_true', help='This flag will aggregate data form all available nodes.')
     parser.add_argument('-k', '--key', type=str)
     parser.add_argument('-ln', '--lab-name', type=str)
     parser.add_argument('-la', '--lab-address', type=str)
@@ -170,6 +189,30 @@ if __name__ == '__main__':
             chrom, start = get_params_from_query(args.query)
             r = data_request_public(args.endpoint, chrom, start)
             handle_request(r, args)
+
+    elif args.endpoint.endswith('variants-private') and args.all_nodes:
+        available_laboratories = requests.post(urljoin(args.endpoint, 'nodes')).json()
+
+        data = []
+        for lab in available_laboratories[::-1]:
+            print('Getting information from \"{}\" laboratory.'.format(lab['laboratory-name']))
+            endpoint = urljoin(lab['address'], 'variants-private')
+            r = data_request(endpoint, args.chrom, args.start, args.stop)
+
+            try:
+                obtained_data = r.json()
+            except Exception:
+                print('ERROR from \"{}\" laboratory.'.format(lab['laboratory-name']))
+                continue
+
+            if 'encryption_key' in obtained_data:
+                obtained_data['result'] = decrypt_result(obtained_data)
+                obtained_data.pop('encryption_key')
+
+            data.append(obtained_data)
+
+        print(data)
+
     elif args.endpoint.endswith('variants-private'):
         r = data_request(args.endpoint, args.chrom, args.start, args.stop)
         if r.status_code == 200:
@@ -178,26 +221,11 @@ if __name__ == '__main__':
         else:
             print(r.text)
 
-    elif args.add_node:
+    elif args.endpoint.endswith('add-node'):
         add_node(args.endpoint, args.key, args.lab_address, args.lab_name)
 
     elif args.generate:
         handle_keys_generation()
 
     elif args.nodes:
-        available_laboratories = requests.post(args.endpoint).json()
-
-        if args.save:
-            if not os.path.isdir('nodes'):
-                os.mkdir('nodes')
-            for lab in available_laboratories:
-                name = lab['laboratory-name']
-
-                with open(os.path.join('nodes', '{}.json'.format(name)), 'w') as file:
-                    json.dump(lab, file)
-
-                with open(os.path.join('nodes', 'public.{}.key'.format(name)), 'w') as file:
-                    file.writelines(lab['public-key'])
-
-        if args.verbose:
-            pprint(available_laboratories)
+        get_nodes(args)
