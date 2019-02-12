@@ -6,6 +6,7 @@ from urllib.parse import urljoin
 from configparser import ConfigParser
 
 import data_share
+from utils.request_id_generator.RequestIdGenerator import RequestIdGenerator
 
 config = ConfigParser()
 config.read(os.path.join(os.getcwd(), 'config.ini'), encoding='utf-8')
@@ -60,6 +61,7 @@ class UserValidation(object):
             'user_id': user_id,
             'node': node,
             'request_node': config.get('NODE', 'LABORATORY_NAME'),
+            'request_id': RequestIdGenerator.generate_request_id()
         }
         post_json = dict(sorted(post_json.items()))
         post_json.update({'signature': data_share.DataShare.get_signature_for_message(post_json).decode()})

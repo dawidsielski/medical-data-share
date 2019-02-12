@@ -359,6 +359,7 @@ def check_user():
             abort(403)
 
         result = {
+            'request_id': RequestIdGenerator.generate_request_id(),
             'result': UserValidation.check_local_users(data['user_id'], data['node']),
         }
         result = dict(sorted(result.items()))
