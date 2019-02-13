@@ -64,24 +64,6 @@ def page_not_found(error):
     return render_template('page_not_found.html', **data), 404
 
 
-@server.route("/sample-data")
-def send_data():
-    """
-    Sample data to be send.
-    """
-    encrypted = DataShare.encrypt_data("The message sdfsdlksjflksjflsdkj.")
-    # response keys must be sorted
-    response = {
-        "data": encrypted,
-        "name": 'Laboratory-Warsaw',
-    }
-    print('Data send: ' + json.dumps(response))
-
-    response.update({'signature': DataShare.get_signature_for_message(response)})
-
-    return jsonify(response), 200
-
-
 @server.route("/data", methods=['GET', 'POST'])
 def receive_data():
     """
@@ -94,7 +76,7 @@ def receive_data():
     """
     if request.method == 'POST':
         data = json.loads(request.get_json())
-        print('Data recivied: ' + json.dumps(data))
+        print('Data received: ' + json.dumps(data))
         if not DataShare.validate_signature_from_message(data):
             logger.info("Invalid signature.")
             abort(403, "Invalid signature.")
@@ -115,7 +97,7 @@ def add_node():
     This is an endpoint which is responsible for adding other laboratory (node) to the federation.
 
     Performing GET request will result in 403 (unauthorized).
-    Performing POST request will resutl in adding the incoming node to this computer providing the correct data in request.
+    Performing POST request will result in adding the incoming node to this computer providing the correct data in request.
 
     POST request must be signed. If it is not the node will not be added.
     """
@@ -136,6 +118,9 @@ def add_node():
 
         with open(os.path.join('nodes', '{}.json'.format(data['laboratory-name'])), 'w') as file:
             json.dump(data, file)
+
+        with open(os.path.join('nodes', 'public.{}.key'.format(data['laboratory-name'])), 'w') as file:
+            file.writelines(data['public-key'])
 
         return 'Success', 200
     abort(403)
@@ -190,7 +175,6 @@ def variants_public():
         try:
             chromosome_results = TabixedTableVarinatDB.get_variants(chrom, start, start)
             response = {
-
                 'request_id': RequestIdGenerator.generate_random_id(),
                 'lab_name': config.get('NODE', 'LABORATORY_NAME'),
                 'result': list(chromosome_results)
@@ -242,7 +226,6 @@ def variants_private():
             data_sharing_logger.info("No public key supports this request.")
             abort(400)
 
-
         try:
             param_keys = params.keys()
             genome_build = 'hg19'  # this will be hg19 or hg38
@@ -255,9 +238,6 @@ def variants_private():
                 chromosome_results = TabixedTableVarinatDB.get_variants(params['chrom'])
             else:
                 chromosome_results = []
-
-            chromosome_results = list(chromosome_results)
-            print(chromosome_results)
 
         except KeyError as e:
             data_sharing_logger.exception(e)
@@ -348,12 +328,24 @@ def check_user():
     """
     if request.method == 'POST':
         data = request.json
-        print(data)
+
+        try:
+            with open(os.path.join('nodes', 'public.{}.key'.format(data['request_node'])), 'r') as file:
+                public_key = file.read()
+        except FileNotFoundError as e:
+            data_sharing_logger.exception("Remote user check failed. Request: {}".format(data))
+            data_sharing_logger.exception(e)
+            abort(403)
+
+        if not DataShare.validate_signature_from_message(data, public_key=public_key):
+            abort(403)
 
         result = {
+            'request_id': RequestIdGenerator.generate_request_id(),
             'result': UserValidation.check_local_users(data['user_id'], data['node']),
         }
-        print(result)
+        result.update({'signature': DataShare.get_signature_for_message(result).decode()})
+        data_sharing_logger.info("Remote user check. {}".format(result))
         return jsonify(result)
 
     abort(400)

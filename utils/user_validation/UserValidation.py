@@ -5,6 +5,9 @@ import requests
 from urllib.parse import urljoin
 from configparser import ConfigParser
 
+import data_share
+from utils.request_id_generator.RequestIdGenerator import RequestIdGenerator
+
 config = ConfigParser()
 config.read(os.path.join(os.getcwd(), 'config.ini'), encoding='utf-8')
 
@@ -44,7 +47,7 @@ class UserValidation(object):
     @staticmethod
     def check_remote_node(user_id, node):
         """
-        This functin checks if user named <user_id> exists in remote node.
+        This function checks if user named <user_id> exists in remote node.
         :param user_id: (str) user identification string
         :param node: (str) the name of the node
         :return: (dict) user authorization information
@@ -56,12 +59,27 @@ class UserValidation(object):
 
         post_json = {
             'user_id': user_id,
-            'node': node
+            'node': node,
+            'request_node': config.get('NODE', 'LABORATORY_NAME'),
+            'request_id': RequestIdGenerator.generate_request_id()
         }
+        post_json = dict(sorted(post_json.items()))
+        post_json.update({'signature': data_share.DataShare.get_signature_for_message(post_json).decode()})
 
         check_user_request = requests.post(urljoin(node_address, 'check-user'), json=post_json)
+
+        if check_user_request.status_code is not 200:
+            return False
+
         check_user_response = check_user_request.json()
-        return check_user_response
+
+        with open(os.path.join('nodes', 'public.{}.key'.format(node)), 'r') as file:
+            public_key = file.read()
+
+        if not data_share.DataShare.validate_signature_from_message(check_user_response, public_key=public_key):
+            return False
+
+        return check_user_response['result']
 
     @staticmethod
     def validate_user(user_id):
@@ -74,4 +92,4 @@ class UserValidation(object):
         if node == config.get('NODE', 'LABORATORY_NAME'):
             return UserValidation.check_local_users(user_id, node)
         else:
-            return UserValidation.check_remote_node(user_id, node)['result']
+            return UserValidation.check_remote_node(user_id, node)

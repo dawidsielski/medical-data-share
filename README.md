@@ -37,6 +37,41 @@ pip3 install -r requirements.txt
 
 When everything is installed you have to change directory to `medical-data-share`. Then just run `python3 app.py`.
 
+### Adding to exiscing federation
+
+For the user of the new Node:
+1. Using medical-data-share.py client generate your own key pair by running:
+```
+python3 medical-data-share.py -g
+```
+This will ask you for the name of the node. Please provide the same laboratory name as in `config.ini` file. Then hit enter.
+
+Now in keys folder you hafe three files.
+2. From keys folder copy the file names `public.<your_username>@<your_node_name>.key` to the folder called `public_keys` of the server that you are running the app.
+3. On the server there will be folder called keys. Please copy file called `public.key` to your computer.
+4. Now you must ask an authorized person to add your node to federation. To have that please send to this person the following information:
+* laboratory_name (the same as in config file)
+* laboratory_address (the same as in config file)
+* `public.key` file downloaded from a server
+5. Now run:
+```
+python3 medical-data-share.py -n
+```
+
+This will generate a folder called `nodes`. Please copy the contents of this folder to the remote `nodes` folder on your server.
+
+
+For the user that is asked to add node:
+1. When you recieve a message with the data including:
+* laboratory_name (the same as in config file)
+* laboratory_address (the same as in config file)
+* `public.key` file downloaded from a server
+you can run the following command:
+```
+python medical-data.share -e http://<your_laboratory_address>/add-node --lab-name <laboratory_name_provided> --lab-address <laboratory_address provided> -k <path_to_a_public_key_provided>
+```
+Running this will add new node to every node in federation.
+
 ### Dockerfile
 
 If you want to use docker there is a Dockerfile provided.

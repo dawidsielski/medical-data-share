@@ -85,7 +85,7 @@ class DataShare(object):
         This function checks if incoming message is valid for this machine.
         :param message: (obj) json incoming message
         :param signature:
-        :return:
+        :return: (bool) True if the signature is valid False otherwise
         """
         if signature is None:
             signature = message.pop('signature')
@@ -110,6 +110,7 @@ class DataShare(object):
         :param message: (obj) json message that needs to be signed
         :return: (str) b64encoded signature for given message
         """
+        message = dict(sorted(message.items()))
         message = json.dumps(message)
 
         private_key_path = os.path.join('keys', 'private.key')
