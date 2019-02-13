@@ -8,9 +8,9 @@ class PublicKeyPreparation(object):
     @staticmethod
     def prepare_public_key():
         public_key_path = os.path.join('keys', 'public.key')
-        random_part = RandomIdGenerator.generate_random_id(64)
+        random_part = RandomIdGenerator.generate_random_id(20)
 
-        laboratory = input("Please write your laboratory name (the same name as in config file)>>")
+        laboratory = input("Please write your laboratory name (the same name as in config file) >>")
         user_id = f'{random_part}@{laboratory}'
         new_public_key_path = os.path.join('keys', f'public.{user_id}.key')
 
