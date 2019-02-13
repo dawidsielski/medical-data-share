@@ -7,10 +7,16 @@ import os
 class TabixedTableVarinatDB(VariantDB):
 
     @staticmethod
-    def get_variants(chrom=None, start=None, end=None):
-        """Call tabix and generate an array of strings for each line it returns."""
+    def get_genome_filename(genome_type):
         variants_path = os.path.join(os.getcwd(), 'data')
-        genome_filename = os.path.join(variants_path, 'gnomad.exomes.r2.0.2.sites.ACAFAN.tsv.gz')
+        if genome_type == 'hg38':
+            return os.path.join(variants_path, 'gnomad.exomes.r2.0.2.sites.ACAFAN.tsv.gz')
+        return os.path.join(variants_path, 'gnomad.exomes.r2.0.2.sites.ACAFAN.tsv.gz')
+
+    @staticmethod
+    def get_variants(chrom=None, start=None, end=None, genome_type='hg19'):
+        """Call tabix and generate an array of strings for each line it returns."""
+        genome_filename = TabixedTableVarinatDB.get_genome_filename(genome_type)
 
         if chrom is None:
             query = ''
