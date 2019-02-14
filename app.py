@@ -6,6 +6,7 @@ from configparser import ConfigParser
 from data_share.KeyGeneration import KeyGeneration
 from nodes_available.NodesChecker import NodesChecker
 from utils.public_variants_handler.PublicVariantsHandler import PublicVariantsHandler
+from utils.nodes_key_pair_updator.NodesKeyPairUpdator import NodeKeyPairUpdator
 
 config = ConfigParser()
 config.read(os.path.join(os.getcwd(), 'config.ini'), encoding='utf-8')
@@ -25,6 +26,7 @@ def check_folder(folder_name):
 sched = BackgroundScheduler(daemon=True, timezone=config.get('NODE', 'TIMEZONE'))
 sched.add_job(NodesChecker.get_all_nodes_availability, 'interval', minutes=1)
 sched.add_job(PublicVariantsHandler.reset_limit, 'cron', day='*')
+sched.add_job(NodeKeyPairUpdator.update_keys, 'cron', minute='*')
 sched.start()
 
 
@@ -38,6 +40,7 @@ if __name__ == '__main__':
     from data_share_website.data_share_website import server
 
     if int(os.environ.get('FLASK_DEBUG', 0)):
+        # app.run(use_reloader=False)
         server.run(debug=True, port=8080, host='0.0.0.0')
     else:
         server.run(host='0.0.0.0', port=80)
