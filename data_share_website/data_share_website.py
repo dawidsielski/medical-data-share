@@ -369,7 +369,7 @@ def update_keys():
         public_key_path = os.path.join('public_keys', 'public.{}.key'.format(data['user_id']))
         try:
             with open(public_key_path, 'r') as file:
-                public_key = file.readlines()
+                public_key = file.read()
         except FileNotFoundError as e:
             abort(400)
 
@@ -389,7 +389,7 @@ def update_keys():
         public_key_path = os.path.join('nodes', 'public.{}.key'.format(data['node']))
         try:
             with open(public_key_path, 'r') as file:
-                public_key = file.readlines()
+                public_key = file.read()
         except FileNotFoundError as e:
             abort(400)
 
