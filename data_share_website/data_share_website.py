@@ -363,12 +363,13 @@ def check_user():
 
 @server.route('/update-keys', methods=['GET', 'POST'])
 def update_keys():
+    """
+    This function is responsible for updating public keys.
+    """
     data = request.get_json()
     keys = data.keys()
 
     if 'user_id' in keys:
-        # validate message from user
-
         public_key_path = os.path.join('public_keys', 'public.{}.key'.format(data['user_id']))
         try:
             with open(public_key_path, 'r') as file:
@@ -389,8 +390,6 @@ def update_keys():
             abort(400)
 
     if 'node' in keys:
-        # validate message from another node
-
         public_key_path = os.path.join('nodes', 'public.{}.key'.format(data['node']))
         try:
             with open(public_key_path, 'r') as file:
@@ -400,6 +399,7 @@ def update_keys():
 
         if not DataShare.validate_signature_from_message(data, public_key=public_key):
             abort(400)
+
         try:
             new_public_key = os.path.join('nodes', 'public.{}.key'.format(data['node']))
             with open(new_public_key, 'w') as file:

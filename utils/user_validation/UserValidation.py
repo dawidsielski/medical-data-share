@@ -100,6 +100,11 @@ class UserValidation(object):
 
     @staticmethod
     def check_key_expiration_date():
+        """
+        This function checks for new keys and sets them expiration date.
+
+        It produces file that contains dictionary with user_id as key and expiration date as value.
+        """
         expiration_dates_file = os.path.join('utils', 'user_validation', 'expiration_dates.json')
 
         if not os.path.isfile(expiration_dates_file):
@@ -122,17 +127,29 @@ class UserValidation(object):
 
     @staticmethod
     def key_expired(user_id):
+        """
+        This function shecks if key has expired.
+        :param user_id: (str) user_id together with node information
+        :return: (bool) True is key has expired False otherwise
+        """
         expiration_dates_file = os.path.join('utils', 'user_validation', 'expiration_dates.json')
 
         with open(expiration_dates_file, 'r') as file:
             expiration_dates = json.load(file)
 
-        user_expiration_date = expiration_dates[user_id]
+        try:
+            user_expiration_date = expiration_dates[user_id]
+        except KeyError:
+            return False
 
         return datetime.datetime.strptime(user_expiration_date, '%Y-%m-%d').date() < datetime.date.today()
 
     @staticmethod
     def update_expiration_key_date(user_id):
+        """
+        This function updates expiration date for a user given by user_id
+        :param user_id: (str) user_id with node part
+        """
         expiration_dates_file = os.path.join('utils', 'user_validation', 'expiration_dates.json')
 
         with open(expiration_dates_file, 'r') as file:
