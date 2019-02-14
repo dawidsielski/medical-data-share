@@ -347,7 +347,7 @@ def check_user():
         if not DataShare.validate_signature_from_message(data, public_key=public_key):
             abort(401)
 
-        if UserValidation.key_expired(data['user_id']):
+        if UserValidation.key_expired('{}@{}'.format(data['user_id'], data['node'])):
             abort(401)
 
         result = {
