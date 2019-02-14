@@ -342,10 +342,13 @@ def check_user():
         except FileNotFoundError as e:
             data_sharing_logger.exception("Remote user check failed. Request: {}".format(data))
             data_sharing_logger.exception(e)
-            abort(403)
+            abort(401)
 
         if not DataShare.validate_signature_from_message(data, public_key=public_key):
-            abort(403)
+            abort(401)
+
+        if UserValidation.key_expired(data['user_id']):
+            abort(401)
 
         result = {
             'request_id': RequestIdGenerator.generate_request_id(),
@@ -380,6 +383,8 @@ def update_keys():
             new_public_key = os.path.join('public_keys', 'public.{}.key'.format(data['user_id']))
             with open(new_public_key, 'w') as file:
                 file.writelines(data['public_key'])
+
+            UserValidation.update_expiration_key_date(data['user_id'])
         except Exception:
             abort(400)
 
