@@ -142,7 +142,3 @@ class UserValidation(object):
 
         with open(expiration_dates_file, 'w') as file:
             json.dump(expiration_dates, file)
-
-
-if __name__ == '__main__':
-    # UserValidation.check_key_expiration_date()
