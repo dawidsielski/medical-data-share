@@ -30,7 +30,7 @@ def data_request_public(endpoint, genome_build, chrom=None, start=None, end=None
 
 
 def data_request(endpoint, genome_build, chrom=None, start=None, end=None):
-    data = prepare_public_request(chrom, genome_build, start, end)
+    data = prepare_public_request(chrom, start, end, genome_build)
     data.update({'user_id': PublicKeyPreparation.get_user_id()})
     data.update({'signature': DataShare.get_signature_for_message(data).decode()})
     return requests.post(endpoint, json=data)
