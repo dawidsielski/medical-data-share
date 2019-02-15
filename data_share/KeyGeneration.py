@@ -19,7 +19,7 @@ class KeyGeneration(object):
         self.private_key = 0
         self.public_key = 0
 
-    def generate_keys(self, key_length):
+    def generate_keys(self, key_length=4096):
         """
         This function only generates public and private keys.
         :param key_length: (int)
@@ -48,20 +48,30 @@ class KeyGeneration(object):
 
         return self.private_key, self.public_key
 
-    def _load_private(self):
+    def load_old_keys(self):
+        """
+        This function loads public and private key from `keys` folder.
+        :return: private_key, public_key
+        """
+        self._load_private('private.old')
+        self._load_public('public.old')
+
+        return self.private_key, self.public_key
+
+    def _load_private(self, filename='private'):
         """
         This function loads private key.
         """
         path = os.path.join('keys')
-        with open(os.path.join(path, '{}.key'.format('private')), 'rb') as file:
+        with open(os.path.join(path, '{}.key'.format(filename)), 'rb') as file:
             self.private_key = RSA.importKey(file.read())
 
-    def _load_public(self):
+    def _load_public(self, filename='public'):
         """
         This function loads public key.
         """
         path = os.path.join('keys')
-        with open(os.path.join(path, '{}.key'.format('public')), 'rb') as file:
+        with open(os.path.join(path, '{}.key'.format(filename)), 'rb') as file:
             self.public_key = RSA.importKey(file.read())
 
     def load_or_generate(self):

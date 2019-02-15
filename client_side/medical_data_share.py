@@ -30,7 +30,7 @@ def data_request_public(endpoint, genome_build, chrom=None, start=None, end=None
 
 
 def data_request(endpoint, genome_build, chrom=None, start=None, end=None):
-    data = prepare_public_request(chrom, genome_build, start, end)
+    data = prepare_public_request(chrom, start, end, genome_build)
     data.update({'user_id': PublicKeyPreparation.get_user_id()})
     data.update({'signature': DataShare.get_signature_for_message(data).decode()})
     return requests.post(endpoint, json=data)
@@ -221,6 +221,8 @@ if __name__ == '__main__':
 
     parser.add_argument('-n', '--nodes', action='store_true', help="Will download available nodes.")
 
+    parser.add_argument('-ck', '--check-key', action='store_true', help="Will check your key")
+
     args = parser.parse_args()
     # print(args)
 
@@ -271,3 +273,18 @@ if __name__ == '__main__':
 
     elif args.nodes:
         get_nodes(args)
+
+    elif args.check_key:
+        data = {
+            'user_id': get_user_id()
+        }
+        data.update({'signature': DataShare.get_signature_for_message(data).decode()})
+
+        r = requests.post(urljoin(args.endpoint, 'check-key'), json=data)
+
+        if not r.json():
+            print('Your key is authorized to perform private queries.')
+        else:
+            print('You are not authorized to perform private operations or your key has expired.')
+
+

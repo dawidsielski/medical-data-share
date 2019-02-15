@@ -342,10 +342,13 @@ def check_user():
         except FileNotFoundError as e:
             data_sharing_logger.exception("Remote user check failed. Request: {}".format(data))
             data_sharing_logger.exception(e)
-            abort(403)
+            abort(401)
 
         if not DataShare.validate_signature_from_message(data, public_key=public_key):
-            abort(403)
+            abort(401)
+
+        if UserValidation.key_expired('{}@{}'.format(data['user_id'], data['node'])):
+            abort(401)
 
         result = {
             'request_id': RequestIdGenerator.generate_request_id(),
@@ -356,3 +359,73 @@ def check_user():
         return jsonify(result)
 
     abort(400)
+
+
+@server.route('/update-keys', methods=['GET', 'POST'])
+def update_keys():
+    """
+    This function is responsible for updating public keys.
+    """
+    data = request.get_json()
+    keys = data.keys()
+
+    if 'user_id' in keys:
+        public_key_path = os.path.join('public_keys', 'public.{}.key'.format(data['user_id']))
+        try:
+            with open(public_key_path, 'r') as file:
+                public_key = file.read()
+        except FileNotFoundError as e:
+            abort(400)
+
+        if not DataShare.validate_signature_from_message(data, public_key=public_key):
+            abort(400)
+
+        try:
+            new_public_key = os.path.join('public_keys', 'public.{}.key'.format(data['user_id']))
+            with open(new_public_key, 'w') as file:
+                file.writelines(data['public_key'])
+
+            UserValidation.update_expiration_key_date(data['user_id'])
+        except Exception:
+            abort(400)
+
+    if 'node' in keys:
+        public_key_path = os.path.join('nodes', 'public.{}.key'.format(data['node']))
+        try:
+            with open(public_key_path, 'r') as file:
+                public_key = file.read()
+        except FileNotFoundError as e:
+            abort(400)
+
+        if not DataShare.validate_signature_from_message(data, public_key=public_key):
+            abort(400)
+
+        try:
+            new_public_key = os.path.join('nodes', 'public.{}.key'.format(data['node']))
+            with open(new_public_key, 'w') as file:
+                file.writelines(data['public_key'])
+        except Exception:
+            abort(400)
+
+    return "Success", 200
+
+
+@server.route('/check-key', methods=['GET', 'POST'])
+def check_key():
+    """
+    This function checks if key is authorized to perform private queries.
+    :return: (bool) False if key is authorized, True otherwise
+    """
+    data = request.json
+
+    public_key_path = os.path.join('public_keys', 'public.{}.key'.format(data['user_id']))
+    try:
+        with open(public_key_path, 'r') as file:
+            public_key = file.read()
+    except FileNotFoundError as e:
+        abort(400)
+
+    if not DataShare.validate_signature_from_message(data, public_key=public_key):
+        abort(400)
+
+    return jsonify(UserValidation.key_expired(data['user_id']))

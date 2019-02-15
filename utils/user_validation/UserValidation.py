@@ -1,6 +1,7 @@
 import os
 import json
 import requests
+import datetime
 
 from urllib.parse import urljoin
 from configparser import ConfigParser
@@ -27,6 +28,9 @@ class UserValidation(object):
                 public_key = file.read()
         except FileNotFoundError:
             public_key = False
+
+        if UserValidation.key_expired('{}@{}'.format(user_id, node)):
+            return False
 
         return public_key
 
@@ -93,3 +97,65 @@ class UserValidation(object):
             return UserValidation.check_local_users(user_id, node)
         else:
             return UserValidation.check_remote_node(user_id, node)
+
+    @staticmethod
+    def check_key_expiration_date():
+        """
+        This function checks for new keys and sets them expiration date.
+
+        It produces file that contains dictionary with user_id as key and expiration date as value.
+        """
+        expiration_dates_file = os.path.join('utils', 'user_validation', 'expiration_dates.json')
+
+        if not os.path.isfile(expiration_dates_file):
+            with open(expiration_dates_file, 'w') as file:
+                json.dump({}, file)
+
+        with open(expiration_dates_file, 'r') as file:
+            expiration_dates = json.load(file)
+
+        existing_expiration_dates = set(expiration_dates.keys())
+        existing_files = set([x[7:-4] for x in os.listdir('public_keys')])
+
+        new_keys = existing_files - existing_expiration_dates
+
+        for user_id in list(new_keys):
+            expiration_dates[user_id] = (datetime.date.today() + datetime.timedelta(days=30)).isoformat()
+
+        with open(expiration_dates_file, 'w') as file:
+            json.dump(expiration_dates, file)
+
+    @staticmethod
+    def key_expired(user_id):
+        """
+        This function shecks if key has expired.
+        :param user_id: (str) user_id together with node information
+        :return: (bool) True is key has expired False otherwise
+        """
+        expiration_dates_file = os.path.join('utils', 'user_validation', 'expiration_dates.json')
+
+        with open(expiration_dates_file, 'r') as file:
+            expiration_dates = json.load(file)
+
+        try:
+            user_expiration_date = expiration_dates[user_id]
+        except KeyError:
+            return False
+
+        return datetime.datetime.strptime(user_expiration_date, '%Y-%m-%d').date() < datetime.date.today()
+
+    @staticmethod
+    def update_expiration_key_date(user_id):
+        """
+        This function updates expiration date for a user given by user_id
+        :param user_id: (str) user_id with node part
+        """
+        expiration_dates_file = os.path.join('utils', 'user_validation', 'expiration_dates.json')
+
+        with open(expiration_dates_file, 'r') as file:
+            expiration_dates = json.load(file)
+
+        expiration_dates[user_id] = datetime.datetime.strptime(expiration_dates[user_id], '%Y-%m-%d').date() + datetime.timedelta(days=30)
+
+        with open(expiration_dates_file, 'w') as file:
+            json.dump(expiration_dates, file)

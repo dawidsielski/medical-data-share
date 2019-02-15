@@ -104,7 +104,7 @@ class DataShare(object):
         return public_key.verify(h, signature)
 
     @staticmethod
-    def get_signature_for_message(message):
+    def get_signature_for_message(message, filename='private.key'):
         """
         This function prepares signature for the message.
         :param message: (obj) json message that needs to be signed
@@ -113,7 +113,7 @@ class DataShare(object):
         message = dict(sorted(message.items()))
         message = json.dumps(message)
 
-        private_key_path = os.path.join('keys', 'private.key')
+        private_key_path = os.path.join('keys', filename)
         with open(private_key_path, 'rb') as file:
             private_key = RSA.importKey(file.read())
 
