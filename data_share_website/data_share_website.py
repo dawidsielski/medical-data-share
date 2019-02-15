@@ -329,6 +329,8 @@ def available_nodes():
 @server.route('/check-user', methods=['GET', 'POST'])
 def check_user():
     """
+    This function is responsible for validating if a user is authorized to perform private data acquisition.
+
     As a get request this function will give 400 bad request status code.
 
     As a post request this function will check if given user is authorized to get the data from server.
