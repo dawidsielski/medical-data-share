@@ -412,6 +412,20 @@ def update_keys():
 
 @server.route('/check-key', methods=['GET', 'POST'])
 def check_key():
+    """
+    This function checks if key is authorized to perform private queries.
+    :return: (bool) False if key is authorized, True otherwise
+    """
     data = request.json
+
+    public_key_path = os.path.join('public_keys', 'public.{}.key'.format(data['user_id']))
+    try:
+        with open(public_key_path, 'r') as file:
+            public_key = file.read()
+    except FileNotFoundError as e:
+        abort(400)
+
+    if not DataShare.validate_signature_from_message(data, public_key=public_key):
+        abort(400)
 
     return jsonify(UserValidation.key_expired(data['user_id']))
