@@ -10,7 +10,7 @@ class TabixedTableVarinatDB(VariantDB):
     def get_genome_filename(genome_type):
         variants_path = os.path.join(os.getcwd(), 'data')
         if genome_type == 'hg38':
-            return os.path.join(variants_path, 'gnomad.exomes.r2.0.2.sites.ACAFAN.tsv.gz')
+            return os.path.join(variants_path, 'tmp_hg38_sorted.tsv.gz')
         return os.path.join(variants_path, 'gnomad.exomes.r2.0.2.sites.ACAFAN.tsv.gz')
 
     @staticmethod
