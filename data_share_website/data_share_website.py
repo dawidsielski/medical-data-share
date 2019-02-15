@@ -150,7 +150,11 @@ def variants_public():
 
         try:
             params = request.get_json()
-            genome_build = 'hg19'  # this will be hg19 or hg38
+            print(params)
+            try:
+                genome_build = params['genome_build']
+            except KeyError as e:
+                genome_build = 'hg19'
 
             if 'query' in params:
                 pattern = re.compile(r'(?P<CHROM>(\d+))[ :](?P<START>(\d+))([ :](?P<STOP>\d+))?')
@@ -173,7 +177,7 @@ def variants_public():
             return abort(500)
 
         try:
-            chromosome_results = TabixedTableVarinatDB.get_variants(chrom, start, start)
+            chromosome_results = TabixedTableVarinatDB.get_variants(chrom, start, start, genome_build)
             response = {
                 'request_id': RequestIdGenerator.generate_random_id(),
                 'lab_name': config.get('NODE', 'LABORATORY_NAME'),
@@ -228,14 +232,17 @@ def variants_private():
 
         try:
             param_keys = params.keys()
-            genome_build = 'hg19'  # this will be hg19 or hg38
+            try:
+                genome_build = params['genome_build']
+            except KeyError as e:
+                genome_build = 'hg19'
 
             if 'end' in param_keys and 'start' in param_keys and 'chrom' in param_keys:
-                chromosome_results = TabixedTableVarinatDB.get_variants(params['chrom'], params['start'], params['end'])
+                chromosome_results = TabixedTableVarinatDB.get_variants(params['chrom'], params['start'], params['end'], genome_build)
             elif 'start' in param_keys and 'chrom' in param_keys:
-                chromosome_results = TabixedTableVarinatDB.get_variants(params['chrom'], params['start'], params['start'])
+                chromosome_results = TabixedTableVarinatDB.get_variants(params['chrom'], params['start'], params['start'], genome_build)
             elif 'chrom' in param_keys:
-                chromosome_results = TabixedTableVarinatDB.get_variants(params['chrom'])
+                chromosome_results = TabixedTableVarinatDB.get_variants(params['chrom'], genome_build)
             else:
                 chromosome_results = []
 

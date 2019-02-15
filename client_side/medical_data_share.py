@@ -14,22 +14,23 @@ from data_share.KeyGeneration import KeyGeneration
 from utils.PublicKeyPreparation import PublicKeyPreparation
 
 
-def prepare_public_request(chrom=None, start=None, end=None):
+def prepare_public_request(chrom=None, start=None, end=None, genome_build=None):
     data = {
         'chrom': chrom,
+        'genome_build': genome_build,
         'start': start,
         'end': end
     }
     return data
 
 
-def data_request_public(endpoint, chrom=None, start=None, end=None):
-    data = prepare_public_request(chrom, start, end)
+def data_request_public(endpoint, genome_build, chrom=None, start=None, end=None):
+    data = prepare_public_request(chrom, start, end, genome_build)
     return requests.post(endpoint, json=data)
 
 
-def data_request(endpoint, chrom=None, start=None, end=None):
-    data = prepare_public_request(chrom, start, end)
+def data_request(endpoint, genome_build, chrom=None, start=None, end=None):
+    data = prepare_public_request(chrom, genome_build, start, end)
     data.update({'user_id': PublicKeyPreparation.get_user_id()})
     data.update({'signature': DataShare.get_signature_for_message(data).decode()})
     return requests.post(endpoint, json=data)
@@ -207,6 +208,7 @@ if __name__ == '__main__':
     parser.add_argument('-ch', '--chrom', type=int, help='Chromosome number.')
     parser.add_argument('--start', type=int, help='Starting position.')
     parser.add_argument('--stop', type=int, help='Ending position.')
+    parser.add_argument('-gb', '--genome-build', type=str, help='Holds information about gemone build.', default='hg19')
 
     parser.add_argument('-a', '--all-nodes', action='store_true', help='This flag will aggregate data form all available nodes.')
     parser.add_argument('-k', '--key', type=str, help='Path to a public key file.')
@@ -243,18 +245,18 @@ if __name__ == '__main__':
 
     elif args.endpoint.endswith('variants'):
         if args.chrom and args.start:
-            r = data_request_public(args.endpoint, args.chrom, args.start)
+            r = data_request_public(args.endpoint, args.genome_build, args.chrom, args.start)
             handle_request(r, args)
         elif args.query:
             chrom, start = get_params_from_query(args.query)
-            r = data_request_public(args.endpoint, chrom, start)
+            r = data_request_public(args.endpoint, args.genome_build, chrom, start)
             handle_request(r, args)
 
     elif args.endpoint.endswith('variants-private') and args.all_nodes:
         variants_from_all_nodes(args, private=True)
 
     elif args.endpoint.endswith('variants-private'):
-        r = data_request(args.endpoint, args.chrom, args.start, args.stop)
+        r = data_request(args.endpoint, args.genome_build, args.chrom, args.start, args.stop)
         if r.status_code == 200:
             message = json.loads(r.text)
             handle_request(r, args)
