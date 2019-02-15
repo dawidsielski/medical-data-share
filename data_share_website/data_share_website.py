@@ -408,3 +408,10 @@ def update_keys():
             abort(400)
 
     return "Success", 200
+
+
+@server.route('/check-key', methods=['GET', 'POST'])
+def check_key():
+    data = request.json
+
+    return jsonify(UserValidation.key_expired(data['user_id']))
