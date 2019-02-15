@@ -155,7 +155,9 @@ class UserValidation(object):
         with open(expiration_dates_file, 'r') as file:
             expiration_dates = json.load(file)
 
-        expiration_dates[user_id] = datetime.datetime.strptime(expiration_dates[user_id], '%Y-%m-%d').date() + datetime.timedelta(days=30)
+        user_expiration_date = datetime.datetime.strptime(expiration_dates[user_id], '%Y-%m-%d').date()
+        time_for_update = datetime.timedelta(days=config.get('NODE', 'USER_KEY_EXPIRATION_TIME'))
+        expiration_dates[user_id] = user_expiration_date + time_for_update
 
         with open(expiration_dates_file, 'w') as file:
             json.dump(expiration_dates, file)
