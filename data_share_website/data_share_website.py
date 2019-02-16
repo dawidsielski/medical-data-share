@@ -437,17 +437,18 @@ def check_key():
 def check_node():
     if request.method == 'POST':
         data = request.json
+        print(data)
 
-        try:
-            with open(os.path.join('nodes', 'public.{}.key'.format(data['request_node'])), 'r') as file:
-                public_key = file.read()
-        except FileNotFoundError as e:
-            data_sharing_logger.exception("Remote node check failed. Request: {}".format(data))
-            data_sharing_logger.exception(e)
-            abort(401)
-
-        if not DataShare.validate_signature_from_message(data, public_key=public_key):
-            abort(401)
+        # try:
+        #     with open(os.path.join('nodes', 'public.{}.key'.format(data['request_node'])), 'r') as file:
+        #         public_key = file.read()
+        # except FileNotFoundError as e:
+        #     data_sharing_logger.exception("Remote node check failed. Request: {}".format(data))
+        #     data_sharing_logger.exception(e)
+        #     abort(401)
+        #
+        # if not DataShare.validate_signature_from_message(data, public_key=public_key):
+        #     abort(401)
 
         return 'Success', 200
     return abort(401)
