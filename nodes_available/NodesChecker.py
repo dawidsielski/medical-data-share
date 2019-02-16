@@ -54,6 +54,7 @@ class NodesChecker(object):
                 'request_node': config.get('NODE', 'LABORATORY_NAME'),
                 'request_id': RequestIdGenerator.generate_random_id()
             }
+            data = dict(sorted(data.items()))
             data.update({'signature': DataShare.get_signature_for_message(data).decode()})
             return requests.post(request_address, json=data).status_code == 200
         except Exception:
