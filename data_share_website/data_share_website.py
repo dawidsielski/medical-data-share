@@ -446,7 +446,7 @@ def check_node():
             abort(401)
 
         if not DataShare.validate_signature_from_message(data, public_key=public_key):
-            print("Not validated message.")
+            data_sharing_logger.info('Check node not valid for data: {}'.format(data))
             abort(401)
 
         return 'Success', 200
