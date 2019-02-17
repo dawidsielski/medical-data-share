@@ -74,6 +74,7 @@ def handle_keys_generation():
             print("Wrong input. Try again.")
             sys.exit(0)
 
+    os.mkdir('keys')
     keys = KeyGeneration()
     keys.load_or_generate()
     PublicKeyPreparation.prepare_public_key()
