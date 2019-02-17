@@ -169,7 +169,7 @@ def variants_from_all_nodes(args, private=False):
             endpoint = urljoin(lab['address'], 'variants-private')
         else:
             endpoint = urljoin(lab['address'], 'variants')
-        r = data_request(endpoint, args.chrom, args.start, args.stop)
+        r = data_request(endpoint, args.genome_build, args.chrom, args.start, args.stop)
 
         try:
             obtained_data = r.json()
