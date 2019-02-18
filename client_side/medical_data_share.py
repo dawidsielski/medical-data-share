@@ -204,8 +204,13 @@ def variants_from_all_nodes(args, private=False):
         pprint(result)
 
     if args.save:
-        with open('query_result_{}.json'.format(datetime.datetime.now().isoformat()), 'w') as file:
+        filename = 'all_chr_{}_start_stop_{}.json'.format(args.chrom, args.start, args.stop)
+        print('Saving to json file called {}'.format(filename))
+
+        with open(filename, 'w') as file:
             json.dump(result, file)
+
+        print('Successfully saved.')
 
 
 if __name__ == '__main__':
