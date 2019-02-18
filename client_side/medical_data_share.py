@@ -142,11 +142,18 @@ def add_node(endpoint, public_key_path, node_address, lab_name):
 def get_nodes(args):
     available_laboratories = requests.post(args.endpoint).json()
 
+    if args.verbose:
+        pprint(available_laboratories)
+    else:
+        print('If you want to print the result please specify -v flag.')
+
     if args.save:
+        print('Saving to /nodes folder.')
         if not os.path.isdir('nodes'):
             os.mkdir('nodes')
         for lab in available_laboratories:
             name = lab['laboratory-name']
+            print('Saving {} laboratory.'.format(name))
 
             with open(os.path.join('nodes', '{}.json'.format(name)), 'w') as file:
                 json.dump(lab, file)
@@ -154,8 +161,9 @@ def get_nodes(args):
             with open(os.path.join('nodes', 'public.{}.key'.format(name)), 'w') as file:
                 file.writelines(lab['public-key'])
 
-            if args.verbose:
-                pprint(available_laboratories)
+        print('All nodes saved.')
+    else:
+        print('If you want to save the result please specify -s flag.')
 
 
 def variants_from_all_nodes(args, private=False):
@@ -273,6 +281,7 @@ if __name__ == '__main__':
         handle_keys_generation()
 
     elif args.nodes:
+        print('Getting available nodes.')
         get_nodes(args)
 
     elif args.check_key:
