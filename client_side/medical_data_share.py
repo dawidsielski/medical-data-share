@@ -141,6 +141,7 @@ def add_node(endpoint, public_key_path, node_address, lab_name):
 
 def get_nodes(args):
     available_laboratories = requests.post(args.endpoint).json()
+    print('There are {} laboratories available.'.format(len(available_laboratories)))
 
     if args.verbose:
         pprint(available_laboratories)
@@ -203,7 +204,7 @@ def variants_from_all_nodes(args, private=False):
         pprint(result)
 
     if args.save:
-        with open('query_result.json', 'w') as file:
+        with open('query_result_{}.json'.format(datetime.datetime.now().isoformat()), 'w') as file:
             json.dump(result, file)
 
 
@@ -227,8 +228,6 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--save', action='store_true')
     parser.add_argument('-v', '--verbose', action='store_true')
     parser.add_argument('-r', '--raw', action='store_true', help='Will print raw response.')
-
-    parser.add_argument('-n', '--nodes', action='store_true', help="Will download available nodes.")
 
     parser.add_argument('-ck', '--check-key', action='store_true', help="Will check your key")
 
@@ -280,7 +279,7 @@ if __name__ == '__main__':
     elif args.generate:
         handle_keys_generation()
 
-    elif args.nodes:
+    elif args.endpoint.endswith('nodes'):
         print('Getting available nodes.')
         get_nodes(args)
 
