@@ -388,6 +388,7 @@ def update_keys():
                 file.writelines(data['public_key'])
 
             UserValidation.update_expiration_key_date(data['user_id'])
+            data_sharing_logger.info('User {} updated key.'.format(data['user_id']))
         except Exception:
             abort(400)
 
@@ -406,6 +407,8 @@ def update_keys():
             new_public_key = os.path.join('nodes', 'public.{}.key'.format(data['node']))
             with open(new_public_key, 'w') as file:
                 file.writelines(data['public_key'])
+
+            data_sharing_logger.info('Node {} updated key.'.format(data['node']))
         except Exception:
             abort(400)
 
