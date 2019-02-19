@@ -55,6 +55,7 @@ class NodeKeyPairUpdator(object):
 
         for key, value in available_nodes.items():
             url = urljoin(value['address'], 'update-keys')
+            logger.info('Sending for {}'.format(key))
 
             keys = KeyGeneration()
             keys.load_keys()
