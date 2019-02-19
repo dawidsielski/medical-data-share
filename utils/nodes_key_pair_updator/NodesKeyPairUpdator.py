@@ -54,18 +54,17 @@ class NodeKeyPairUpdator(object):
         logger.info(available_nodes)
 
         for key, value in available_nodes.items():
-            if value['availability']:
-                url = urljoin(value['address'], 'update-keys')
+            url = urljoin(value['address'], 'update-keys')
 
-                keys = KeyGeneration()
-                keys.load_keys()
+            keys = KeyGeneration()
+            keys.load_keys()
 
-                data = {
-                    'node': config.get('NODE', 'LABORATORY_NAME'),
-                    'public_key': keys.public_key.exportKey().decode(),
-                    'request_id': RequestIdGenerator.generate_request_id(),
-                }
-                data.update({'signature': DataShare.get_signature_for_message(data, filename='private.old.key').decode()})
+            data = {
+                'node': config.get('NODE', 'LABORATORY_NAME'),
+                'public_key': keys.public_key.exportKey().decode(),
+                'request_id': RequestIdGenerator.generate_request_id(),
+            }
+            data.update({'signature': DataShare.get_signature_for_message(data, filename='private.old.key').decode()})
 
-                r = requests.post(url, json=data)
-                logger.info('{} {} {} {}'.format(key, url, r.status_code, data))
+            r = requests.post(url, json=data)
+            logger.info('{} {} {} {}'.format(key, url, r.status_code, data))
