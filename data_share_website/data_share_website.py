@@ -377,9 +377,11 @@ def update_keys():
             with open(public_key_path, 'r') as file:
                 public_key = file.read()
         except FileNotFoundError as e:
+            data_sharing_logger.info('No user id {}, present in node'.format(data['user_id']))
             abort(400)
 
         if not DataShare.validate_signature_from_message(data, public_key=public_key):
+            data_sharing_logger.info('User id {}, invalid signature'.format(data['user_id']))
             abort(400)
 
         try:
@@ -390,6 +392,7 @@ def update_keys():
             UserValidation.update_expiration_key_date(data['user_id'])
             data_sharing_logger.info('User {} updated key.'.format(data['user_id']))
         except Exception as e:
+            data_sharing_logger.error('Error in user_id update key')
             data_sharing_logger.exception(e)
             abort(500)
 
@@ -399,9 +402,11 @@ def update_keys():
             with open(public_key_path, 'r') as file:
                 public_key = file.read()
         except FileNotFoundError as e:
+            data_sharing_logger.info('No node {}, present in node'.format(data['node']))
             abort(400)
 
         if not DataShare.validate_signature_from_message(data, public_key=public_key):
+            data_sharing_logger.info('Node {}, invalid signature'.format(data['node']))
             abort(400)
 
         try:
@@ -411,7 +416,9 @@ def update_keys():
 
             data_sharing_logger.info('Node {} updated key.'.format(data['node']))
         except Exception:
-            abort(400)
+            data_sharing_logger.error('Error in node update key')
+            data_sharing_logger.exception(e)
+            abort(500)
 
     return "Success", 200
 
