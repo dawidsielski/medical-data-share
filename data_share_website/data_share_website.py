@@ -382,7 +382,6 @@ def update_keys():
         if not DataShare.validate_signature_from_message(data, public_key=public_key):
             abort(400)
 
-        print(data)
         try:
             new_public_key = os.path.join('public_keys', 'public.{}.key'.format(data['user_id']))
             with open(new_public_key, 'w') as file:
