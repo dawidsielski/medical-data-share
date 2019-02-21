@@ -2,7 +2,11 @@ import os
 import requests
 import json
 
+from data_share import DataShare
+from utils.request_id_generator.RequestIdGenerator import RequestIdGenerator
+
 from configparser import ConfigParser
+from urllib.parse import urljoin
 
 NODES_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'nodes')
 
@@ -41,12 +45,18 @@ class NodesChecker(object):
         :return: (bool) says if node is available for data sharing
         """
         try:
-            request_address = node_information[address_key]
+            request_address = urljoin(node_information[address_key], 'check-node')
         except KeyError:
             return False
 
         try:
-            return requests.get(request_address).status_code == 200
+            data = {
+                'request_node': config.get('NODE', 'LABORATORY_NAME'),
+                'request_id': RequestIdGenerator.generate_random_id()
+            }
+            data = dict(sorted(data.items()))
+            data.update({'signature': DataShare.get_signature_for_message(data).decode()})
+            return requests.post(request_address, json=data).status_code == 200
         except Exception:
             return False
 

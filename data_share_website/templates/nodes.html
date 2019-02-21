@@ -6,6 +6,7 @@
             <p><h3><b>{{ key }}</b>
             {% if value['availability'] %}
                 <span class="badge badge-success">Available</span>
+                <a class="btn btn-primary" href="{{ value['address'] }}" role="button">Node address</a>
             {% else %}
                 <span class="badge badge-secondary">Unavailable</span>
             {% endif %}

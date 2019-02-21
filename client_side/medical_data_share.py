@@ -62,7 +62,7 @@ def handle_request(r, args):
 
 
 def handle_keys_generation():
-    if os.listdir('keys'):
+    if os.path.isdir('keys'):
         choice = input("Keys are generated. Do you want to generate new ones? [y or n](default n)")
         if choice in ['n', 'N', 'NO', 'No']:
             print("No keys generated.")
@@ -73,10 +73,14 @@ def handle_keys_generation():
         else:
             print("Wrong input. Try again.")
             sys.exit(0)
+    else:
+        os.mkdir('keys')
 
     keys = KeyGeneration()
     keys.load_or_generate()
     PublicKeyPreparation.prepare_public_key()
+
+    # os.rename(os.path.join('keys', 'public.key'), os.path.join('keys', public_name))
 
 
 def get_params_from_query(query):
@@ -140,12 +144,20 @@ def add_node(endpoint, public_key_path, node_address, lab_name):
 
 def get_nodes(args):
     available_laboratories = requests.post(args.endpoint).json()
+    print('There are {} laboratories available.'.format(len(available_laboratories)))
+
+    if args.verbose:
+        pprint(available_laboratories)
+    else:
+        print('If you want to print the result please specify -v flag.')
 
     if args.save:
+        print('Saving to /nodes folder.')
         if not os.path.isdir('nodes'):
             os.mkdir('nodes')
         for lab in available_laboratories:
             name = lab['laboratory-name']
+            print('Saving {} laboratory.'.format(name))
 
             with open(os.path.join('nodes', '{}.json'.format(name)), 'w') as file:
                 json.dump(lab, file)
@@ -153,8 +165,9 @@ def get_nodes(args):
             with open(os.path.join('nodes', 'public.{}.key'.format(name)), 'w') as file:
                 file.writelines(lab['public-key'])
 
-            if args.verbose:
-                pprint(available_laboratories)
+        print('All nodes saved.')
+    else:
+        print('If you want to save the result please specify -s flag.')
 
 
 def variants_from_all_nodes(args, private=False):
@@ -168,7 +181,7 @@ def variants_from_all_nodes(args, private=False):
             endpoint = urljoin(lab['address'], 'variants-private')
         else:
             endpoint = urljoin(lab['address'], 'variants')
-        r = data_request(endpoint, args.chrom, args.start, args.stop)
+        r = data_request(endpoint, args.genome_build, args.chrom, args.start, args.stop)
 
         try:
             obtained_data = r.json()
@@ -194,8 +207,13 @@ def variants_from_all_nodes(args, private=False):
         pprint(result)
 
     if args.save:
-        with open('query_result.json', 'w') as file:
+        filename = 'all_chr_{}_start_stop_{}.json'.format(args.chrom, args.start, args.stop)
+        print('Saving to json file called {}'.format(filename))
+
+        with open(filename, 'w') as file:
             json.dump(result, file)
+
+        print('Successfully saved.')
 
 
 if __name__ == '__main__':
@@ -219,9 +237,8 @@ if __name__ == '__main__':
     parser.add_argument('-v', '--verbose', action='store_true')
     parser.add_argument('-r', '--raw', action='store_true', help='Will print raw response.')
 
-    parser.add_argument('-n', '--nodes', action='store_true', help="Will download available nodes.")
-
     parser.add_argument('-ck', '--check-key', action='store_true', help="Will check your key")
+    parser.add_argument('-uk', '--update-user-key', action='store_true', help="Will update your key")
 
     args = parser.parse_args()
     # print(args)
@@ -271,7 +288,8 @@ if __name__ == '__main__':
     elif args.generate:
         handle_keys_generation()
 
-    elif args.nodes:
+    elif args.endpoint.endswith('nodes'):
+        print('Getting available nodes.')
         get_nodes(args)
 
     elif args.check_key:
@@ -287,4 +305,33 @@ if __name__ == '__main__':
         else:
             print('You are not authorized to perform private operations or your key has expired.')
 
+    elif args.update_user_key:
+        username = PublicKeyPreparation.get_user_id()
+        old_public_name = 'public.old.{}.key'.format(username)
+        public_name = 'public.{}.key'.format(username)
+        os.rename(os.path.join('keys', public_name), os.path.join('keys', old_public_name))
+        os.rename(os.path.join('keys', 'private.key'), os.path.join('keys', 'private.old.key'))
+
+        keys = KeyGeneration()
+        keys.load_or_generate()
+
+        os.rename(os.path.join('keys', 'public.key'), os.path.join('keys', public_name))
+
+        with open(os.path.join('keys', 'user_id'), 'w') as file:
+            file.write(username)
+
+        data = {
+            'user_id': username,
+            'public_key': keys.public_key.exportKey().decode(),
+        }
+        data = dict(sorted(data.items()))
+        data.update({'signature': DataShare.get_signature_for_message(data, 'private.old.key').decode()})
+
+        r = requests.post(args.endpoint, json=data)
+
+        if r.status_code == 200:
+            print('Key successfully updated.')
+        else:
+            print('Key NOT updated.')
+            print(r.text)
 

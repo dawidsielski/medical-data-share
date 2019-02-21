@@ -68,9 +68,23 @@ For the user that is asked to add node:
 * `public.key` file downloaded from a server
 you can run the following command:
 ```
-python medical-data.share -e http://<your_laboratory_address>/add-node --lab-name <laboratory_name_provided> --lab-address <laboratory_address provided> -k <path_to_a_public_key_provided>
+python medical-data.share.py -e http://<your_laboratory_address>/add-node --lab-name <laboratory_name_provided> --lab-address <laboratory_address provided> -k <path_to_a_public_key_provided>
 ```
 Running this will add new node to every node in federation.
+
+### Key check (private)
+
+The application requires from you updating keys by the number of days specified in the config file.
+
+If at some point you will not be able to perform private queries please check if your key needs to be updated.
+
+This can me done bu running:
+```
+python medical-data-share.py -e http://<your_laboratory_address>/ -ck
+```
+Running this will tell you if your key needs an update or not.
+
+
 
 ### Dockerfile
 

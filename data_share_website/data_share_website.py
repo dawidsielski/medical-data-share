@@ -329,6 +329,8 @@ def available_nodes():
 @server.route('/check-user', methods=['GET', 'POST'])
 def check_user():
     """
+    This function is responsible for validating if a user is authorized to perform private data acquisition.
+
     As a get request this function will give 400 bad request status code.
 
     As a post request this function will check if given user is authorized to get the data from server.
@@ -380,14 +382,17 @@ def update_keys():
         if not DataShare.validate_signature_from_message(data, public_key=public_key):
             abort(400)
 
+        print(data)
         try:
             new_public_key = os.path.join('public_keys', 'public.{}.key'.format(data['user_id']))
             with open(new_public_key, 'w') as file:
                 file.writelines(data['public_key'])
 
             UserValidation.update_expiration_key_date(data['user_id'])
-        except Exception:
-            abort(400)
+            data_sharing_logger.info('User {} updated key.'.format(data['user_id']))
+        except Exception as e:
+            data_sharing_logger.exception(e)
+            abort(500)
 
     if 'node' in keys:
         public_key_path = os.path.join('nodes', 'public.{}.key'.format(data['node']))
@@ -404,6 +409,8 @@ def update_keys():
             new_public_key = os.path.join('nodes', 'public.{}.key'.format(data['node']))
             with open(new_public_key, 'w') as file:
                 file.writelines(data['public_key'])
+
+            data_sharing_logger.info('Node {} updated key.'.format(data['node']))
         except Exception:
             abort(400)
 
@@ -429,3 +436,23 @@ def check_key():
         abort(400)
 
     return jsonify(UserValidation.key_expired(data['user_id']))
+
+
+@server.route('/check-node', methods=['GET', 'POST'])
+def check_node():
+    if request.method == 'POST':
+        data = request.json
+        try:
+            with open(os.path.join('nodes', 'public.{}.key'.format(data['request_node'])), 'r') as file:
+                public_key = file.read()
+        except FileNotFoundError as e:
+            data_sharing_logger.exception("Remote node check failed. Request: {}".format(data))
+            data_sharing_logger.exception(e)
+            abort(401)
+
+        if not DataShare.validate_signature_from_message(data, public_key=public_key):
+            data_sharing_logger.info('Check node not valid for data: {}'.format(data))
+            abort(401)
+
+        return 'Success', 200
+    return 'Success', 200
