@@ -43,6 +43,6 @@ if __name__ == '__main__':
 
     if int(os.environ.get('FLASK_DEBUG', 0)):
         # app.run(use_reloader=False)
-        server.run(debug=True, port=8080, host='0.0.0.0')
+        server.run(debug=True, port=8080, host='0.0.0.0', use_reloader=False)
     else:
         server.run(host='0.0.0.0', port=80)

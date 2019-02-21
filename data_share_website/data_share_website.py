@@ -382,6 +382,7 @@ def update_keys():
         if not DataShare.validate_signature_from_message(data, public_key=public_key):
             abort(400)
 
+        print(data)
         try:
             new_public_key = os.path.join('public_keys', 'public.{}.key'.format(data['user_id']))
             with open(new_public_key, 'w') as file:
@@ -389,8 +390,9 @@ def update_keys():
 
             UserValidation.update_expiration_key_date(data['user_id'])
             data_sharing_logger.info('User {} updated key.'.format(data['user_id']))
-        except Exception:
-            abort(400)
+        except Exception as e:
+            data_sharing_logger.exception(e)
+            abort(500)
 
     if 'node' in keys:
         public_key_path = os.path.join('nodes', 'public.{}.key'.format(data['node']))

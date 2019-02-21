@@ -62,7 +62,7 @@ def handle_request(r, args):
 
 
 def handle_keys_generation():
-    if os.listdir('keys'):
+    if os.path.isdir('keys'):
         choice = input("Keys are generated. Do you want to generate new ones? [y or n](default n)")
         if choice in ['n', 'N', 'NO', 'No']:
             print("No keys generated.")
@@ -73,11 +73,14 @@ def handle_keys_generation():
         else:
             print("Wrong input. Try again.")
             sys.exit(0)
+    else:
+        os.mkdir('keys')
 
-    os.mkdir('keys')
     keys = KeyGeneration()
     keys.load_or_generate()
     PublicKeyPreparation.prepare_public_key()
+
+    # os.rename(os.path.join('keys', 'public.key'), os.path.join('keys', public_name))
 
 
 def get_params_from_query(query):
@@ -235,6 +238,7 @@ if __name__ == '__main__':
     parser.add_argument('-r', '--raw', action='store_true', help='Will print raw response.')
 
     parser.add_argument('-ck', '--check-key', action='store_true', help="Will check your key")
+    parser.add_argument('-uk', '--update-user-key', action='store_true', help="Will update your key")
 
     args = parser.parse_args()
     # print(args)
@@ -301,4 +305,33 @@ if __name__ == '__main__':
         else:
             print('You are not authorized to perform private operations or your key has expired.')
 
+    elif args.update_user_key:
+        username = PublicKeyPreparation.get_user_id()
+        old_public_name = 'public.old.{}.key'.format(username)
+        public_name = 'public.{}.key'.format(username)
+        os.rename(os.path.join('keys', public_name), os.path.join('keys', old_public_name))
+        os.rename(os.path.join('keys', 'private.key'), os.path.join('keys', 'private.old.key'))
+
+        keys = KeyGeneration()
+        keys.load_or_generate()
+
+        os.rename(os.path.join('keys', 'public.key'), os.path.join('keys', public_name))
+
+        with open(os.path.join('keys', 'user_id'), 'w') as file:
+            file.write(username)
+
+        data = {
+            'user_id': username,
+            'public_key': keys.public_key.exportKey().decode(),
+        }
+        data = dict(sorted(data.items()))
+        data.update({'signature': DataShare.get_signature_for_message(data, 'private.old.key').decode()})
+
+        r = requests.post(args.endpoint, json=data)
+
+        if r.status_code == 200:
+            print('Key successfully updated.')
+        else:
+            print('Key NOT updated.')
+            print(r.text)
 
