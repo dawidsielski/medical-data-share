@@ -16,6 +16,8 @@ key_path = lambda name: os.path.join('keys', name)
 config = ConfigParser()
 config.read(os.path.join(os.getcwd(), 'config.ini'), encoding='utf-8')
 
+os.makedirs('logs', exist_ok=True)
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 

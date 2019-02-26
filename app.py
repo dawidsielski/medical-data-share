@@ -12,7 +12,7 @@ from utils.user_validation.UserValidation import UserValidation
 config = ConfigParser()
 config.read(os.path.join(os.getcwd(), 'config.ini'), encoding='utf-8')
 
-FOLDERS = ['logs', 'data_acquisition', 'nodes', 'keys', 'logs/data_sharing', 'logs/website', 'public_keys']
+FOLDERS = ['logs', 'nodes', 'keys', 'logs/data_sharing', 'logs/website', 'public_keys']
 
 
 def check_folder(folder_name):
