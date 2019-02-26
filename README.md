@@ -24,7 +24,7 @@ Variables you will have to set are:
 
 ### Prerequisites
 
-In order to run this application you have to have `python3` installed together with `python3-pip`.
+In order to run this application you have to have `python3` (version 3.6 is required) installed together with `python3-pip`.
 
 ### Installing
 
@@ -35,7 +35,7 @@ pip3 install -r requirements.txt
 
 ### Running
 
-When everything is installed you have to change directory to `medical-data-share`. Then just run `python3 app.py`.
+Running the application is simple as running `python3 app.py` from commandline.
 
 ### Adding to exiscing federation
 
