@@ -37,7 +37,7 @@ pip3 install -r requirements.txt
 
 Running the application is simple as running `python3 app.py` from commandline.
 
-### Adding to exiscing federation
+### Adding to existing federation
 
 For the user of the new Node:
 1. Using medical-data-share.py client generate your own key pair by running:
