@@ -110,4 +110,4 @@ TODO
 
 ## Acknowledgments
 
-Special thanks to my supervisor Pawel Sztromwasser.
+Special thanks to my supervisor [Paweł Sztromwasser](https://github.com/seru71).
