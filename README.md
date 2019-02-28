@@ -40,9 +40,9 @@ Running the application is simple as running `python3 app.py` from commandline.
 ### Adding to existing federation
 
 For the user of the new Node:
-1. Using medical-data-share.py client generate your own key pair by running:
+1. Using medical_data_share.py client generate your own key pair by running:
 ```
-python3 medical-data-share.py -g
+python3 medical_data_share.py -g
 ```
 This will ask you for the name of the node. Please provide the same laboratory name as in `config.ini` file. Then hit enter.
 
@@ -55,7 +55,7 @@ Now in keys folder you hafe three files.
 * `public.key` file downloaded from a server
 5. Now run:
 ```
-python3 medical-data-share.py -n
+python3 medical_data_share.py -e http://<laboratory_from_federation_address>/nodes -s
 ```
 
 This will generate a folder called `nodes`. Please copy the contents of this folder to the remote `nodes` folder on your server.
@@ -104,7 +104,7 @@ If at some point you will not be able to perform private queries please check if
 
 This can me done bu running:
 ```
-python medical-data-share.py -e http://<your_laboratory_address>/ -ck
+python medical_data_share.py -e http://<your_laboratory_address>/ -ck
 ```
 Running this will tell you if your key needs an update or not.
 
