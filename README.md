@@ -75,9 +75,9 @@ Running this will add new node to every node in federation.
 ### How to supply data
 
 #### Tabix files
-The application supports two genome types. First is hg19 and the second is hg39.
+The application supports two genome types. First is hg19 and the second is hg38.
 
-By default application works with hg19 files provided but there is a possibility for supplying files for hg39.
+By default application works with hg19 files provided but there is a possibility for supplying files for hg38.
 
 The folder structure must look like this provided below. 
 
@@ -86,10 +86,12 @@ data
 ├── hg19
 │   ├── gnomad.exomes.r2.0.2.sites.ACAFAN.tsv.gz
 │   └── gnomad.exomes.r2.0.2.sites.ACAFAN.tsv.gz.tbi
-└── hg39
+└── hg38
     ├── gnomad.exomes.r2.0.2.sites.ACAFAN.tsv.gz
     └── gnomad.exomes.r2.0.2.sites.ACAFAN.tsv.gz.tbi
 ```
+
+The filenames of the hg19 or hg38 tabix filenames must be set in config file under DATA section.
 
 ### Key check (private)
 
