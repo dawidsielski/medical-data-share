@@ -2,6 +2,10 @@ from variant_db.VariantDB import VariantDB
 
 from subprocess import Popen, PIPE
 import os
+from configparser import ConfigParser
+
+config = ConfigParser()
+config.read(os.path.join(os.getcwd(), 'config.ini'), encoding='utf-8')
 
 
 class TabixedTableVarinatDB(VariantDB):
@@ -10,8 +14,8 @@ class TabixedTableVarinatDB(VariantDB):
     def get_genome_filename(genome_type):
         variants_path = os.path.join(os.getcwd(), 'data')
         if genome_type == 'hg38':
-            return os.path.join(variants_path, 'hg38', 'tmp_hg38_sorted.tsv.gz')
-        return os.path.join(variants_path, 'hg19', 'gnomad.exomes.r2.0.2.sites.ACAFAN.tsv.gz')
+            return os.path.join(variants_path, 'hg38', config.get('DATA', 'HG_38_FILENAME'))
+        return os.path.join(variants_path, 'hg19', config.get('DATA', 'HG_19_FILENAME'))
 
     @staticmethod
     def get_variants(chrom=None, start=None, end=None, genome_type='hg19'):

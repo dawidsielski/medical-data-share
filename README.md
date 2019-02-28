@@ -72,6 +72,25 @@ python medical-data.share.py -e http://<your_laboratory_address>/add-node --lab-
 ```
 Running this will add new node to every node in federation.
 
+### How to supply data
+
+#### Tabix files
+The application supports two genome types. First is hg19 and the second is hg39.
+
+By default application works with hg19 files provided but there is a possibility for supplying files for hg39.
+
+The folder structure must look like this provided below. 
+
+```
+data
+├── hg19
+│   ├── gnomad.exomes.r2.0.2.sites.ACAFAN.tsv.gz
+│   └── gnomad.exomes.r2.0.2.sites.ACAFAN.tsv.gz.tbi
+└── hg39
+    ├── gnomad.exomes.r2.0.2.sites.ACAFAN.tsv.gz
+    └── gnomad.exomes.r2.0.2.sites.ACAFAN.tsv.gz.tbi
+```
+
 ### Key check (private)
 
 The application requires from you updating keys by the number of days specified in the config file.
