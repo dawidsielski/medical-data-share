@@ -93,6 +93,9 @@ data
 
 The filenames of the hg19 or hg38 tabix filenames must be set in config file under DATA section.
 
+#### Other support
+In progress.
+
 ### Key check (private)
 
 The application requires from you updating keys by the number of days specified in the config file.
