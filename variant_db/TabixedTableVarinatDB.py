@@ -11,7 +11,7 @@ class TabixedTableVarinatDB(VariantDB):
         variants_path = os.path.join(os.getcwd(), 'data')
         if genome_type == 'hg38':
             return os.path.join(variants_path, 'hg38', 'tmp_hg38_sorted.tsv.gz')
-        return os.path.join(variants_path, 'gnomad.exomes.r2.0.2.sites.ACAFAN.tsv.gz')
+        return os.path.join(variants_path, 'hg19', 'gnomad.exomes.r2.0.2.sites.ACAFAN.tsv.gz')
 
     @staticmethod
     def get_variants(chrom=None, start=None, end=None, genome_type='hg19'):
