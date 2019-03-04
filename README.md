@@ -73,7 +73,7 @@ Running the application is simple as running `python3 app.py` from commandline.
    
    you can run the following command:
    ```
-   python medical-data.share.py -e http://<your_laboratory_address>/add-node --lab-name <laboratory_name_provided> --lab-address <laboratory_address provided> -k <path_to_a_public_key_provided>
+   python medical_data_share.py -e http://<your_laboratory_address>/add-node --lab-name <laboratory_name_provided> --lab-address <laboratory_address provided> -k <path_to_a_public_key_provided>
    ```
    Running this will add new node to every node in federation.
 
@@ -126,7 +126,7 @@ docker build --tag datashare .
 
 Starting container:
 ```
-docker run --name medical-data-share -p 80:80 -d datashare
+docker run --name medical_data_share -p 80:80 -d datashare
 ```
 
 ## Authors

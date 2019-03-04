@@ -1,6 +1,6 @@
-# Client side for medical-data-share
+# Client side for medical_data_share
 
-This folder contains python script which is responsible for getting data from medical-data-share website.
+This folder contains CLI python script which is responsible for requesting information from FreqShare website.
 
 ## Getting Started
 
