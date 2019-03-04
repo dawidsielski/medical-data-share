@@ -241,17 +241,7 @@ if __name__ == '__main__':
     parser.add_argument('-uk', '--update-user-key', action='store_true', help="Will update your key")
 
     args = parser.parse_args()
-    # print(args)
 
-    print("---------------------------------------------------")
-    print(r"""
- __  __          _ _           _       _       _              _                    
-|  \/  | ___  __| (_) ___ __ _| |   __| | __ _| |_ __ _   ___| |__   __ _ _ __ ___ 
-| |\/| |/ _ \/ _` | |/ __/ _` | |  / _` |/ _` | __/ _` | / __| '_ \ / _` | '__/ _ \
-| |  | |  __/ (_| | | (_| (_| | | | (_| | (_| | || (_| | \__ \ | | | (_| | | |  __/
-|_|  |_|\___|\__,_|_|\___\__,_|_|  \__,_|\__,_|\__\__,_| |___/_| |_|\__,_|_|  \___|
-        """)
-    print("---------------------------------------------------")
     if not args.verbose:
         print('If you want to see the output please set -v option.')
         print('If you want to see raw output please set -r option.')
