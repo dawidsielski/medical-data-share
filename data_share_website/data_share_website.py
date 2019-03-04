@@ -192,7 +192,7 @@ def variants_public():
 
     data = {
         'lab_name': config.get('NODE', 'LABORATORY_NAME'),
-        'lab_address': config.get('NODE', 'NODE_ADDRESS'),
+        'lab_address': '{}{}'.format(config.get('NODE', 'NODE_ADDRESS'), 'variants'),
         'current_limit': PublicVariantsHandler.get_limit_left(),
     }
     logger.info('Variants public page rendered.')
@@ -272,7 +272,7 @@ def variants_private():
 
     data = {
         'lab_name': config.get('NODE', 'LABORATORY_NAME'),
-        'lab_address': config.get('NODE', 'NODE_ADDRESS'),
+        'lab_address': '{}{}'.format(config.get('NODE', 'NODE_ADDRESS'), 'variants-private'),
     }
     logger.info("Private variants rendered")
     return render_template('private_variants.html', **data)
