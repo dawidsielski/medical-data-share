@@ -37,6 +37,20 @@ pip3 install -r requirements.txt
 
 Running the application is simple as running `python3 app.py` from commandline.
 
+By default it will run on port 80.
+
+If you run into issue with running the app please run it with `sudo`.
+
+#### Developer mode
+If you want to run it using developer mode please run it using:
+```
+python3 app.py --dev
+```
+By default it will fin on port 80. You can change that by running e.g.:
+```
+python3 app.py --dev -p 8080
+```
+
 ### Adding to existing federation
 
 #### For the user of the new Node:
