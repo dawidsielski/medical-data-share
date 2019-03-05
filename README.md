@@ -48,9 +48,9 @@ Running the application is simple as running `python3 app.py` from commandline.
 
    Now in keys folder you have three files.
 
-2. From keys folder copy the file names `public.<your_username>@<your_node_name>.key` to the folder called `public_keys` of the server that you are running the app.
+2. From keys folder copy the file names `public.<your_username>@<your_node_name>.key` to the folder called `public_user_keys` of the server that you are running the app.
 
-3. On the server there will be folder called keys. Please copy file called `public.key` to your computer.
+3. On the server (after first run of the app) there will be folder called keys. Please copy file called `public.key` to your computer.
 
 4. Now you must ask an authorized person to add your node to federation. To have that please send to this person the following information:
     * laboratory_name (the same as in config file)

@@ -24,7 +24,7 @@ class UserValidation(object):
         :return: public_key (str) if user exists, None there is no such user
         """
         try:
-            with open(os.path.join('public_keys', 'public.{}@{}.key'.format(user_id, node)), 'r') as file:
+            with open(os.path.join('public_user_keys', 'public.{}@{}.key'.format(user_id, node)), 'r') as file:
                 public_key = file.read()
         except FileNotFoundError:
             public_key = False
@@ -115,7 +115,7 @@ class UserValidation(object):
             expiration_dates = json.load(file)
 
         existing_expiration_dates = set(expiration_dates.keys())
-        existing_files = set([x[7:-4] for x in os.listdir('public_keys')])
+        existing_files = set([x[7:-4] for x in os.listdir('public_user_keys')])
 
         new_keys = existing_files - existing_expiration_dates
 

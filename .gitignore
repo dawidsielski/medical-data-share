@@ -242,9 +242,9 @@ nodes
 keys
 data
 logs
-public_keys
+public_user_keys
 
-.key
+*.key
 
 # temp files
 temp.json
