@@ -68,7 +68,14 @@ data
     ├── tmp_hg38_sorted.tsv.gz
     └── tmp_hg38_sorted.tsv.gz.tbi
 ```
+Once this is done please enter the filenames of tabixed file into `config.ini` under `DATA` section.
 
+Example:
+```
+[DATA]
+HG_19_FILENAME = gnomad.exomes.r2.0.2.sites.ACAFAN.tsv.gz
+HG_38_FILENAME = tmp_hg38_sorted.tsv.gz
+```
 
 
 # Server side
