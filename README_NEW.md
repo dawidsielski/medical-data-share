@@ -185,6 +185,17 @@ If you want to merge results from all nodes please specify `-a` or `--all` optio
 
 # Linking nodes into a federation
 
-## Start with a pair of nodes
+## For the node that will be added (NODE)
+   1. Run the application for the first time.
+   2. Copy public.key file from keys folder on the server.
+   3. Send this file to the FEDERATION node together with information about node address, node name.
+   4. Using medical_data_share.py from client_side perform `python3 medical_data_share.py -n -e FEDERATION`
+   5. Copy nodes folder from client_side to nodes folder on the server.
+	
+## For the node in federation (FEDERATION)
 
-## Adding more to existing federation
+   1. If you are an authorized user in the node in FEDERATION please run:
+   ```
+   python3 medical_data_share.py -e <endpoint>/add-node --key <path_to_public_key_file> --lab-name <lab_name> --lab-address <lab_address>
+   ```
+   Running this will add new node for every node in the FEDERATION.
