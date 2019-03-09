@@ -5,54 +5,34 @@ Make a note about docker with a link to detailed description"
 
 DataShare is an online tool for sharing medical variants information.
 
-This application gives two interfaces. One is public in which there is a limited amount of requests per day.
-The private one which gives several options for variants data request.
+The application consists of two modules:
+* server_side
+* client_side 
+
+#### Server side
+Server side contains FLASK web application which provides an interface for secure share of genetic variants information in two modes:
+* private
+* public
+
+By default ones can perform public operation which will result in the information of genetic variants in specific place. **Public option is daily limited.**
+
+To obtian access to private operations you have to be an authorized user of any of the lab in federation.
+
+#### Client side
+Client side contains simple python script which is responsible for making public and private queries together with checking user keys, updating user keys, adding new node to federation.
 
 
-## Getting Started
+## Dockerfile
+If you want to use docker there is a Dockerfile provided.
 
-Before running the app there are you have to perform some setup.
-
-First clone the repo by running
- ```
- git clone https://github.com/dawidsielski/medical-data-share.git
- ```
-Then in the folder you will see file called `config.ini`. 
-Depending on your laboratory you will have to fill in the variables inside.
-
-Variables you will have to set are:
-* LABORATORY_NAME - this name will be displayed on a website
-* NODE_ADDRESS - this is an address for this node
-* TIMEZONE - this is a timezone variable
-* MAX_PUBLIC_VARIANT_REQUEST_LIMIT - this holds daily limit for public requests
-
-### Prerequisites
-
-In order to run this application you have to have `python3` (version 3.6 is required) installed together with `python3-pip`.
-
-### Installing
-
-In order to run this app you have to install `requirements.txt` file by running:
+To build the image it you have to run:
 ```
-pip3 install -r requirements.txt
+docker build --tag datashare .
 ```
 
-### Running
-
-Running the application is simple as running `python3 app.py` from commandline.
-
-By default it will run on port 80.
-
-If you run into issue with running the app please run it with `sudo`.
-
-#### Developer mode
-If you want to run it using developer mode please run it using:
+Starting container:
 ```
-python3 app.py --dev
-```
-By default it will fin on port 80. You can change that by running e.g.:
-```
-python3 app.py --dev -p 8080
+docker run --name medical_data_share -p 80:80 -d datashare
 ```
 
 
