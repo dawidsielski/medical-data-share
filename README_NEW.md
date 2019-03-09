@@ -120,14 +120,14 @@ What can I do and how"
 By default there is only possibility to query public variants.
 
 If you want to perform private operations you have to:
-	1. Generate your own keys and username by running:
+   1. Generate your own keys and username by running:
 	```
 	python3 medical_data_share.py -g
 	```
 	You will be prompted to specify your node laboratory name (the same as in config file of the node).
 	Your username will be generated automatically.
-    2. Copy your public key from `keys` folder (public.<your_username>@<your_node>.key) to `public_user_keys` of the node of your lab.
-	3. Now you are ready to perform private queries.
+   2. Copy your public key from `keys` folder (public.<your_username>@<your_node>.key) to `public_user_keys` of the node of your lab.
+   3. Now you are ready to perform private queries.
 
 NOTE:
 Every key pair has its own expiration time which is set by config file (section 'NODE' variable 'USER_KEY_EXPIRATION_TIME')
