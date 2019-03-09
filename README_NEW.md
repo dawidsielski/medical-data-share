@@ -143,14 +143,15 @@ This will generate a folder called nodes.
 
 | Command                                                                                | Description                                         | Endpoint        | Type      | Supported |
 |----------------------------------------------------------------------------------------|-----------------------------------------------------|-----------------|-----------|-----------|
-| python3 medical_data_share.py --priv -ch 1 --start 1 --stop 10                         | Query from start to end                             | From config     | prywatne  | Nie       |
-| python3 medical_data_share.py -e <endpoint>/variants-private -ch 1 --start 1 --stop 10 | Query from start to end                             | Custom endpoint | prywatne  | Tak       |
-| python3 medical_data_share.py --priv -ch 1 --start 1                                   | Query specified posiion                             | From config     | prywatne  | Nie       |
-| python3 medical_data_share.py -e <endpoint>/variants-private -ch 1 --start 1           | Query specified posiion                             | Custom endpoint | prywatne  | Tak       |
-| python3 medical_data_share.py -ch 1 --start 1                                          | Query specified posiion                             | From config     | publiczne | Nie       |
-| python3 medical_data_share.py -ch 1 --start 1 --end 10                                 | Query specified posiion (will omit end information) | From config     | publiczne | Nie       |
-| python3 medical_data_share.py -e <endpoint>/variants -ch 1 --start 1                   | Query specified posiion                             | Custom endpoint | publiczne | Tak       |
-| python3 medical_data_share.py -e <endpoint>/variants -ch 1 --start 1 --end 10          | Query specified posiion (will omit end information) | Custom endpoint | publiczne | Tak       |
+| python3 medical_data_share.py --priv -ch 1 --start 1 --stop 10                         | Query from start to end                             | From config     | prywatne  | No        |
+| python3 medical_data_share.py -e <endpoint>/variants-private -ch 1 --start 1 --stop 10 | Query from start to end                             | Custom endpoint | prywatne  | Yes       |
+| python3 medical_data_share.py --priv -ch 1 --start 1                                   | Query specified posiion                             | From config     | prywatne  | No        |
+| python3 medical_data_share.py -e <endpoint>/variants-private -ch 1 --start 1           | Query specified posiion                             | Custom endpoint | prywatne  | Yes       |
+| python3 medical_data_share.py -ch 1 --start 1                                          | Query specified posiion                             | From config     | publiczne | No        |
+| python3 medical_data_share.py -ch 1 --start 1 --end 10                                 | Query specified posiion (will omit end information) | From config     | publiczne | No        |
+| python3 medical_data_share.py -e <endpoint>/variants -ch 1 --start 1                   | Query specified posiion                             | Custom endpoint | publiczne | Yes       |
+| python3 medical_data_share.py -e <endpoint>/variants -ch 1 --start 1 --end 10          | Query specified posiion (will omit end information) | Custom endpoint | publiczne | Yes       |
+
 Sample endpoint: `http://0.0.0.0:8080
 
 Every command is supported with `-gb hg38` option for hg38 coordinates.
