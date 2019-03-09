@@ -54,6 +54,58 @@ By default it will fin on port 80. You can change that by running e.g.:
 ```
 python3 app.py --dev -p 8080
 ```
+
+
+# Server side
+[\\]: # "Setup (if cannot be covered with the common setup in 1)
+Starting the app
+What can I do and how. (Adding users - generating keys)
+Details of conf - adding data!"
+
+## Getting Started
+
+First clone the repo by running
+ ```
+ git clone https://github.com/dawidsielski/medical-data-share.git
+ ```
+Then (after entering 'medical_data_share' folder) you will see file called `config.ini`. 
+Depending on your laboratory you will have to fill in the variables inside.
+
+Variables you will have to set are:
+* LABORATORY_NAME - this name will be displayed on a website
+* NODE_ADDRESS - this is an address for this node
+* TIMEZONE - this is a timezone variable depending on your location
+* MAX_PUBLIC_VARIANT_REQUEST_LIMIT - this holds daily limit for public requests
+
+### Prerequisites
+
+In order to run this application you have to have `python3` (version 3.6 is required) installed together with `python3-pip`.
+
+### Installing
+
+In order to run this app you have to install `requirements.txt` file by running:
+```
+pip3 install -r requirements.txt
+```
+
+### Running
+
+Running the application is simple as running `python3 app.py` from commandline.
+
+By default it will run on port 80 for which you will need root proviledges.
+
+If you run into issue with running the app please try running it with `sudo`.
+
+### Developer mode
+If you want to run it using developer mode please run it using:
+```
+python3 app.py --dev
+```
+By default it will run on port 80. You can change that by running e.g.:
+```
+python3 app.py --dev -p 8080
+```
+
 ### Adding data
 
 By default the app provides support for hg19 tabixed files. You can also add hg38 file.
@@ -68,8 +120,8 @@ data
     ├── tmp_hg38_sorted.tsv.gz
     └── tmp_hg38_sorted.tsv.gz.tbi
 ```
-Once this is done please enter the filenames of tabixed file into `config.ini` under `DATA` section.
 
+Once this is done please enter the filenames of tabixed file into `config.ini` under `DATA` section.
 Example:
 ```
 [DATA]
@@ -78,12 +130,6 @@ HG_38_FILENAME = tmp_hg38_sorted.tsv.gz
 ```
 
 
-# Server side
-[\\]: # "Setup (if cannot be covered with the common setup in 1)
-Starting the app
-What can I do and how. (Adding users - generating keys)
-Details of conf - adding data!"
-    
 # Client side
 [\\]: # "
 Setup (if cannot be covered with the common setup in 1)
