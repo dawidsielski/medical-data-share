@@ -129,8 +129,8 @@ If you want to perform private operations you have to:
    2. Copy your public key from `keys` folder (public.<your_username>@<your_node>.key) to `public_user_keys` of the node of your lab.
    3. Now you are ready to perform private queries.
 
-NOTE:
-Every key pair has its own expiration time which is set by config file (section 'NODE' variable 'USER_KEY_EXPIRATION_TIME')
+**NOTE:
+Every key pair has its own expiration time which is set by config file (section 'NODE' variable 'USER_KEY_EXPIRATION_TIME' by default set to 30 days)**
 
 #### Check user key
 
