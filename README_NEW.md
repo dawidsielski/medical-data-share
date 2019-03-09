@@ -89,6 +89,73 @@ Details of conf - adding data!"
 Setup (if cannot be covered with the common setup in 1)
 What can I do and how"
 
+## First run
+
+By default there is only possibility to query public variants.
+
+If you want to perform private operations you have to:
+	1. Generate your own keys and username by running:
+	```
+	python3 medical_data_share.py -g
+	```
+	You will be prompted to specify your node laboratory name (the same as in config file of the node).
+	Your username will be generated automatically.
+    2. Copy your public key from `keys` folder (public.<your_username>@<your_node>.key) to `public_user_keys` of the node of your lab.
+	3. Now you are ready to perform private queries.
+
+NOTE:
+Every key pair has its own expiration time which is set by config file (section 'NODE' variable 'USER_KEY_EXPIRATION_TIME')
+
+#### Check user key
+
+To check user key please run:
+```
+python medical_data_share.py -e <your_laboratory_address>/ -ck
+# or
+python medical_data_share.py -e <your_laboratory_address>/ --check-key
+```
+
+As an output you will be told if you have o update your keys or not.
+
+#### Updating user keys
+
+To update personal user keys please run:
+```
+python medical_data_share.py -e <your_laboratory_address>/ -uk
+# or
+python medical_data_share.py -e <your_laboratory_address>/ --update-user-key
+```
+
+## Available nodes
+
+If you want to display available nodes please run:
+```
+python3 medical_data_share.py -e <laboratory_from_federation_address>/nodes -v
+```
+
+If you want to save available nodes please run:
+```
+python3 medical_data_share.py -e <laboratory_from_federation_address>/nodes -s
+```
+This will generate `nodes` folder in which information ablut the nodes will be saved.
+
+This will generate a folder called nodes. 
+
+| Command                                                                                | Description                                         | Endpoint        | Type      | Supported |
+|----------------------------------------------------------------------------------------|-----------------------------------------------------|-----------------|-----------|-----------|
+| python3 medical_data_share.py --priv -ch 1 --start 1 --stop 10                         | Query from start to end                             | From config     | prywatne  | Nie       |
+| python3 medical_data_share.py -e <endpoint>/variants-private -ch 1 --start 1 --stop 10 | Query from start to end                             | Custom endpoint | prywatne  | Tak       |
+| python3 medical_data_share.py --priv -ch 1 --start 1                                   | Query specified posiion                             | From config     | prywatne  | Nie       |
+| python3 medical_data_share.py -e <endpoint>/variants-private -ch 1 --start 1           | Query specified posiion                             | Custom endpoint | prywatne  | Tak       |
+| python3 medical_data_share.py -ch 1 --start 1                                          | Query specified posiion                             | From config     | publiczne | Nie       |
+| python3 medical_data_share.py -ch 1 --start 1 --end 10                                 | Query specified posiion (will omit end information) | From config     | publiczne | Nie       |
+| python3 medical_data_share.py -e <endpoint>/variants -ch 1 --start 1                   | Query specified posiion                             | Custom endpoint | publiczne | Tak       |
+| python3 medical_data_share.py -e <endpoint>/variants -ch 1 --start 1 --end 10          | Query specified posiion (will omit end information) | Custom endpoint | publiczne | Tak       |
+Sample endpoint: `http://0.0.0.0:8080
+
+Every command is supported with `-gb hg38` option for hg38 coordinates.
+If you want to merge results from all nodes please specify `-a` or `--all` option.
+
 # Linking nodes into a federation
 
 ## Start with a pair of nodes
