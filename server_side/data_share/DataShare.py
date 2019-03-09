@@ -95,7 +95,7 @@ class DataShare(object):
         user_id = message['user_id']
 
         message = json.dumps(message)
-        public_key_path = os.path.join('public_keys', f'public.{user_id}.key')
+        public_key_path = os.path.join('public_user_keys', f'public.{user_id}.key')
         with open(public_key_path, 'rb') as file:
             public_key = RSA.importKey(file.read())
 
