@@ -28,7 +28,7 @@ def check_folder(folder_name):
 sched = BackgroundScheduler(daemon=True, timezone=config.get('NODE', 'TIMEZONE'))
 sched.add_job(NodesChecker.get_all_nodes_availability, 'interval', minutes=1)
 sched.add_job(PublicVariantsHandler.reset_limit, 'cron', day='*')
-sched.add_job(NodeKeyPairUpdator.update_keys, 'cron', hour='*')
+sched.add_job(NodeKeyPairUpdator.update_keys, 'cron', day='*')
 sched.add_job(UserValidation.check_key_expiration_date, 'cron', minute='*')
 sched.start()
 
