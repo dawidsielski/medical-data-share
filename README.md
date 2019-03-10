@@ -14,7 +14,9 @@ Server side contains FLASK web application which provides an interface for secur
 * private
 * public
 
-By default ones can perform public operation which will result in the information of genetic variants in specific place. **Public option is daily limited.**
+By default ones can perform public operation which will result in the information of genetic variants in specific place. 
+
+**Public option is daily limited.**
 
 To obtian access to private operations you have to be an authorized user of any of the lab in federation.
 
