@@ -180,7 +180,7 @@ This will generate a folder called nodes.
 | python3 medical_data_share.py -e <endpoint>/variants -ch 1 --start 1                   | Query specified posiion                             | Custom endpoint | public  | Yes       |
 | python3 medical_data_share.py -e <endpoint>/variants -ch 1 --start 1 --end 10          | Query specified posiion (will omit end information) | Custom endpoint | public  | Yes       |
 
-Sample endpoint: `http://0.0.0.0:8080
+Sample endpoint: http://0.0.0.0:8080
 
 Every command is supported with `-gb hg38` option for hg38 coordinates.
 If you want to merge results from all nodes please specify `-a` or `--all` option.
