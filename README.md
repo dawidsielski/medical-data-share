@@ -171,16 +171,12 @@ This will generate `nodes` folder in which information ablut the nodes will be s
 
 This will generate a folder called nodes. 
 
-| Command                                                                                | Description                                         | Endpoint        | Type    | Supported |
-|----------------------------------------------------------------------------------------|-----------------------------------------------------|-----------------|---------|-----------|
-| python3 medical_data_share.py --priv -ch 1 --start 1 --stop 10                         | Query from start to end                             | From config     | private | No        |
-| python3 medical_data_share.py -e <endpoint>/variants-private -ch 1 --start 1 --stop 10 | Query from start to end                             | Custom endpoint | private | Yes       |
-| python3 medical_data_share.py --priv -ch 1 --start 1                                   | Query specified posiion                             | From config     | private | No        |
-| python3 medical_data_share.py -e <endpoint>/variants-private -ch 1 --start 1           | Query specified posiion                             | Custom endpoint | private | Yes       |
-| python3 medical_data_share.py -ch 1 --start 1                                          | Query specified posiion                             | From config     | public  | No        |
-| python3 medical_data_share.py -ch 1 --start 1 --end 10                                 | Query specified posiion (will omit end information) | From config     | public  | No        |
-| python3 medical_data_share.py -e <endpoint>/variants -ch 1 --start 1                   | Query specified posiion                             | Custom endpoint | public  | Yes       |
-| python3 medical_data_share.py -e <endpoint>/variants -ch 1 --start 1 --end 10          | Query specified posiion (will omit end information) | Custom endpoint | public  | Yes       |
+| Type    | Description                                     | Command                                                                              |
+|---------|-------------------------------------------------|--------------------------------------------------------------------------------------|
+| private | Query genomic interval                          | python3 medical_data_share.py -e HOST_URL/variants-private -ch 1 --start 1 --stop 10 |
+|         | Query genomic position                          | python3 medical_data_share.py -e HOST_URL/variants-private -ch 1 --start 1           |
+| public  | Query genomic posiion (end argument is ignored) | python3 medical_data_share.py -e /variants -ch 1 --start 1                           |
+|         |                                                 | python3 medical_data_share.py -e /variants -ch 1 --start 1 --end 10                  |
 
 Sample endpoint: http://0.0.0.0:8080
 
