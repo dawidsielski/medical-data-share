@@ -150,7 +150,6 @@ def variants_public():
 
         try:
             params = request.get_json()
-            print(params)
             try:
                 genome_build = params['genome_build']
             except KeyError as e:

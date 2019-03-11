@@ -254,6 +254,8 @@ if __name__ == '__main__':
 
     elif args.endpoint.endswith('variants'):
         if (args.chrom and args.start) or (args.chrom and args.start and args.stop):
+            if args.stop:
+                print('Warning! Results will be presented only at position equal to start (stop position will not be used).')
             r = data_request_public(args.endpoint, args.genome_build, args.chrom, args.start)
             handle_request(r, args)
         elif args.query:
