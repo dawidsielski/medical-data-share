@@ -3,7 +3,9 @@
 Common prerequisites  / setup. Describe port changing to 8080 (FLASK_DEBUG) 
 Make a note about docker with a link to detailed description"
 
-DataShare is an online tool for sharing medical variants information.
+DataShare is an online tool for sharing medical variants information. 
+
+The dataShare app can be join into a federation from which you can simply obtain information about variants from all laboratories available in federation.
 
 The application consists of two modules:
 * server_side
