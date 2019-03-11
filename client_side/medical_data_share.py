@@ -253,7 +253,7 @@ if __name__ == '__main__':
         variants_from_all_nodes(args)
 
     elif args.endpoint.endswith('variants'):
-        if args.chrom and args.start:
+        if (args.chrom and args.start) or (args.chrom and args.start and args.stop):
             r = data_request_public(args.endpoint, args.genome_build, args.chrom, args.start)
             handle_request(r, args)
         elif args.query:
