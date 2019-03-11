@@ -180,6 +180,8 @@ This will generate a folder called nodes.
 
 Sample endpoint: http://0.0.0.0:8080
 
+Default enpoint extraction is a planned feature. For now providiing enpoint URL with -e argument is required.
+
 Every command is supported with `-gb hg38` option for hg38 coordinates.
 If you want to merge results from all nodes please specify `-a` or `--all` option.
 
