@@ -5,3 +5,4 @@ numpy==1.15.1
 pycrypto==2.6.1
 apscheduler==3.5.3
 requests==2.21.0
+flask-cors==3.0.7
