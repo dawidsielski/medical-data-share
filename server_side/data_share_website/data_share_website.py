@@ -7,6 +7,8 @@ import re
 from logging.handlers import TimedRotatingFileHandler
 from configparser import ConfigParser
 from flask import Flask, render_template, redirect, url_for, jsonify, request, abort
+from flask_cors import CORS
+
 
 from data_share.DataShare import DataShare
 from data_share.KeyGeneration import KeyGeneration
@@ -20,6 +22,7 @@ config = ConfigParser()
 config.read(os.path.join(os.getcwd(), 'config.ini'), encoding='utf-8')
 
 server = Flask(__name__)
+CORS(server)
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

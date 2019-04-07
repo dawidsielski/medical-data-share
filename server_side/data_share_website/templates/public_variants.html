@@ -16,5 +16,58 @@
       curl -d '{"chrom":"1", "start":"1"}' -H "Content-Type: application/json" -X POST {{ lab_address }}
     </div>
 
+    <div>
+        <form>
+            Chromosome:<br>
+            <input type="text" id="chromosome", value=21><br>
+            Start position:<br>
+            <input type="text" id="start_position", value=9825797><br>
+        </form>
+        <br>
+        <button>Get data</button>
+    </div>
+
+    <!--<table id="variants" class="display" width="100%"></table>-->
+
 </p>
+{% endblock %}
+
+{% block scripts %}
+    var variants;
+
+    $(document).ready(function(){
+    $("button").click(function(){
+        $.ajax({
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            url: "{{ lab_address }}",
+            data: JSON.stringify(
+                {
+                    chrom: parseInt(document.getElementById("chromosome").value),
+                    start: parseInt(document.getElementById("start_position").value)
+                }),
+            success: function (data) {
+                console.log(data);
+                variants = data.result
+            },
+            dataType: "json"
+        });
+    });
+    });
+
+
+    <!--$(document).ready(function() {-->
+    <!--$('#variants').DataTable( {-->
+        <!--data: variants,-->
+        <!--columns: [-->
+            <!--{ title: "Name" },-->
+            <!--{ title: "Position" },-->
+            <!--{ title: "Office" },-->
+            <!--{ title: "Extn." },-->
+            <!--{ title: "Start date" },-->
+            <!--{ title: "Salary" },-->
+            <!--&lt;!&ndash;{ title: "Salary2" }&ndash;&gt;-->
+        <!--]-->
+    <!--});-->
+    <!--});-->
 {% endblock %}
