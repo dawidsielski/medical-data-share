@@ -6,37 +6,54 @@
     <h5>Requests left: {{ current_limit }}</h5>
 </div>
 <p>
-    To obtain data you have to perform post request to this endpoint.
     <div>
-        You can query only a single genomic position at time. Interval querying is not supported by the public API.
-    </div>
+        To obtain data you have to perform post request to this endpoint.
+        <div>
+            You can query only a single genomic position at time. Interval querying is not supported by the public API.
+        </div>
 
-    Sample POST request using curl:
-    <div class="alert alert-secondary" role="alert">
-      curl -d '{"chrom":"1", "start":"1"}' -H "Content-Type: application/json" -X POST {{ lab_address }}
+        Sample POST request using curl:
+        <div class="alert alert-secondary" role="alert">
+          curl -d '{"chrom":"1", "start":"1"}' -H "Content-Type: application/json" -X POST {{ lab_address }}
+        </div>
     </div>
 
     <div>
         <form>
-            Chromosome:<br>
-            <input type="text" id="chromosome", value=21><br>
-            Start position:<br>
-            <input type="text" id="start_position", value=9825797><br>
-        </form>
-        <br>
-        <button>Get data</button>
+            <div class="form-group">
+              <label for="chromosome">Chromosome</label>
+              <input type="number" min="1" max="23" class="form-control" id="chromosome" aria-describedby="chromosomeHelp" placeholder="Enter chromosome number">
+              <small id="chromosomeHelp" class="form-text text-muted">Chromosome number e.g. 1.</small>
+            </div>
+            <div class="form-group">
+                <label for="startingPosition">Starting position</label>
+                <input type="number" class="form-control" id="startingPosition" aria-describedby="startingPositionHelp" placeholder="Enter starting position">
+                <small id="startingPositionHelp" class="form-text text-muted">Starting position for variant.</small>
+              </div>
+            <div class="form-group form-check">
+              <input type="checkbox" class="form-check-input" id="allNodes">
+              <label class="form-check-label" for="allNodes">All nodes</label>
+            </div>
+            <div class="form-group">
+                <label class="form-check-label" for="genomeBuild">Genome build</label>
+                <select class="custom-select mr-sm-2" id="genomeBuild">
+                  <option selected value="hg19">hg19</option>
+                  <option value="hg38">hg38</option>
+                </select>
+              </div>
+            <button type="submit" class="btn btn-primary">Get data</button>
+          </form>
     </div>
-
-    <!--<table id="variants" class="display" width="100%"></table>-->
-
 </p>
 {% endblock %}
 
 {% block scripts %}
-    var variants;
-
     $(document).ready(function(){
     $("button").click(function(){
+        var genome_build_selector = document.getElementById("genomeBuild");
+        var selected_genome_build_index = genome_build_selector.selectedIndex;
+        var all_nodes = document.getElementById("allNodes").checked;
+
         $.ajax({
             type: "POST",
             contentType: "application/json; charset=utf-8",
@@ -44,30 +61,15 @@
             data: JSON.stringify(
                 {
                     chrom: parseInt(document.getElementById("chromosome").value),
-                    start: parseInt(document.getElementById("start_position").value)
+                    start: parseInt(document.getElementById("startingPosition").value),
+                    genome_build: genome_build_selector.options[selected_genome_build_index].text
                 }),
             success: function (data) {
                 console.log(data);
-                variants = data.result
+                console.log(all_nodes)
             },
             dataType: "json"
         });
     });
     });
-
-
-    <!--$(document).ready(function() {-->
-    <!--$('#variants').DataTable( {-->
-        <!--data: variants,-->
-        <!--columns: [-->
-            <!--{ title: "Name" },-->
-            <!--{ title: "Position" },-->
-            <!--{ title: "Office" },-->
-            <!--{ title: "Extn." },-->
-            <!--{ title: "Start date" },-->
-            <!--{ title: "Salary" },-->
-            <!--&lt;!&ndash;{ title: "Salary2" }&ndash;&gt;-->
-        <!--]-->
-    <!--});-->
-    <!--});-->
 {% endblock %}
