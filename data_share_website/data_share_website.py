@@ -104,7 +104,7 @@ def add_node():
     if request.method == 'POST':
         data = request.get_json()
         try:
-            if not DataShare.validate_signature_using_user_id(data):
+            if not DataShare.validate_signature(data):
                 data_sharing_logger.info("Invalid signature. User id:{}".format(data['user_id']))
                 abort(403, "Invalid signature.")
         except KeyError:
