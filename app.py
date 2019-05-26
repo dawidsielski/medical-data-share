@@ -1,4 +1,5 @@
 import os
+import argparse
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from configparser import ConfigParser
@@ -33,6 +34,13 @@ sched.start()
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('-p', '--port', type=int, default=80)
+    parser.add_argument('-d', '--dev', action='store_true')
+
+    args = parser.parse_args()
+
     [check_folder(folder) for folder in FOLDERS]
     keys = KeyGeneration()
     keys.load_or_generate()
@@ -41,8 +49,8 @@ if __name__ == '__main__':
 
     from data_share_website.data_share_website import server
 
-    if int(os.environ.get('FLASK_DEBUG', 0)):
+    if int(os.environ.get('FLASK_DEBUG', 0)) or args.dev:
         # app.run(use_reloader=False)
-        server.run(debug=True, port=8080, host='0.0.0.0', use_reloader=False)
+        server.run(debug=True, port=args.port, host='0.0.0.0', use_reloader=False)
     else:
-        server.run(host='0.0.0.0', port=80)
+        server.run(host='0.0.0.0', port=args.port)
